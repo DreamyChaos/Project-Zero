@@ -1,0 +1,98 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root, [data-theme="dark"] {
+  --bg-base: #0A0D14;
+  --bg-surface-1: #121620;
+  --bg-surface-2: #1A202C;
+  --bg-surface-3: #242C3D;
+
+  --border-subtle: #1E2638;
+  --border-strong: #334155;
+  --border-focus: #6366F1;
+
+  --text-primary: #F8FAFC;
+  --text-secondary: #94A3B8;
+  --text-muted: #94A3B8;
+
+  --accent-primary: #6366F1;
+  --accent-hover: #818CF8;
+
+  --semantic-accept: #10B981;
+  --semantic-reject: #EF4444;
+  --semantic-warning: #F59E0B;
+  --semantic-info: #3B82F6;
+}
+
+[data-theme="light"] {
+  --bg-base: #F8FAFC;
+  --bg-surface-1: #FFFFFF;
+  --bg-surface-2: #F1F5F9;
+  --bg-surface-3: #E2E8F0;
+
+  --border-subtle: #E2E8F0;
+  --border-strong: #CBD5E1;
+  --border-focus: #4F46E5;
+
+  --text-primary: #0F172A;
+  --text-secondary: #475569;
+  --text-muted: #94A3B8;
+
+  --accent-primary: #4F46E5;
+  --accent-hover: #4338CA;
+
+  --semantic-accept: #059669;
+  --semantic-reject: #DC2626;
+  --semantic-warning: #D97706;
+  --semantic-info: #2563EB;
+}
+
+[data-theme="high-contrast"] {
+  --bg-base: #000000;
+  --bg-surface-1: #050505;
+  --bg-surface-2: #111111;
+  --bg-surface-3: #222222;
+
+  --border-subtle: #FFFFFF;
+  --border-strong: #FFFFFF;
+  --border-focus: #FFFF00;
+
+  --text-primary: #FFFFFF;
+  --text-secondary: #DDDDDD;
+  --text-muted: #AAAAAA;
+
+  --accent-primary: #FFFF00;
+  --accent-hover: #FFFF88;
+
+  --semantic-accept: #00FF00;
+  --semantic-reject: #FF0000;
+  --semantic-warning: #FFA500;
+  --semantic-info: #00FFFF;
+}
+
+body {
+  background-color: var(--bg-base);
+  color: var(--text-primary);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  user-select: none;
+}
+
+/* Custom scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg-surface-1);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border-strong);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-muted);
+}

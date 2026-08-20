@@ -1,0 +1,45 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+
+# Build and package output
+dist/
+build/
+.turbo/
+*.tsbuildinfo
+
+# Local environment and secret files
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+*.env
+*.pem
+*.key
+
+# Editor and IDE files
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+!.vscode/tasks.json
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# Testing and Coverage
+coverage/
+.playwright-mcp/
+playwright-report/
+test-results/
+
+# Temporary files
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+apps/web-app/vite.config.ts.timestamp-*
