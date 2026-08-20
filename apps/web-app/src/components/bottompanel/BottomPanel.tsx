@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useWorkspace } from '../../context/WorkspaceContext';
 import { WORKBENCH_CATEGORIES } from './tabRegistry';
-import { BottomTabId } from './types';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 
 export const DesktopBottomPanel: React.FC = () => {
@@ -17,7 +16,7 @@ export const DesktopBottomPanel: React.FC = () => {
   const [activeCategoryId, setActiveCategoryId] = useState<string>('execution');
 
   // Sync active tab with context if provided
-  const currentTabId = (activeBottomTab as BottomTabId) || 'trace';
+  const currentTabId = activeBottomTab || 'trace';
 
   // Find category containing active tab
   useEffect(() => {
@@ -45,7 +44,7 @@ export const DesktopBottomPanel: React.FC = () => {
     setActiveCategoryId(catId);
     const cat = WORKBENCH_CATEGORIES.find((c) => c.id === catId);
     if (cat && cat.tabs.length > 0) {
-      setActiveBottomTab(cat.tabs[0].id as any);
+      setActiveBottomTab(cat.tabs[0].id);
     }
   };
 
@@ -91,7 +90,7 @@ export const DesktopBottomPanel: React.FC = () => {
                   aria-selected={isSelected}
                   aria-controls={`panel-${tab.id}`}
                   tabIndex={isSelected ? 0 : -1}
-                  onClick={() => setActiveBottomTab(tab.id as any)}
+                  onClick={() => setActiveBottomTab(tab.id)}
                   className={`px-2.5 py-0.5 flex items-center space-x-1.5 text-[11px] font-medium rounded transition-all outline-none focus-visible:ring-1 focus-visible:ring-border-focus shrink-0 ${
                     isSelected
                       ? 'bg-bg-surface1 text-txt-primary border border-border-subtle shadow-xs'

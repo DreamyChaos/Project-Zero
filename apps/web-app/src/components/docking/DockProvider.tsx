@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { PanelRegionId, IDockState } from './types';
+import { BottomTabId } from '../bottompanel/types';
 import { PANEL_CONSTRAINTS } from './panelRegistry';
 import { LayoutManager } from './LayoutManager';
 import { LayoutPersistence } from './LayoutPersistence';
@@ -115,7 +116,7 @@ export const DockProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setLayout((prev) => ({ ...prev, activeSidebarTab }));
   }, []);
 
-  const setActiveBottomTab = useCallback((activeBottomTab: 'trace' | 'matrix' | 'math' | 'batch') => {
+  const setActiveBottomTab = useCallback((activeBottomTab: BottomTabId) => {
     setLayout((prev) => ({ ...prev, activeBottomTab }));
   }, []);
 

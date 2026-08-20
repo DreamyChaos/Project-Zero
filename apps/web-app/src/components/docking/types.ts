@@ -1,3 +1,5 @@
+import { BottomTabId } from '../bottompanel/types';
+
 export type PanelRegionId = 'sidebar' | 'inspector' | 'bottomPanel' | 'center';
 
 export type DockTargetRegion = 'left' | 'right' | 'bottom' | 'center' | 'top' | 'floating';
@@ -33,7 +35,7 @@ export interface IDockState {
   inspectorHidden: boolean;
   bottomPanelHidden: boolean;
   activeSidebarTab: 'explorer' | 'syllabus' | 'quizzes';
-  activeBottomTab: 'trace' | 'matrix' | 'math' | 'batch';
+  activeBottomTab: BottomTabId;
   activeInspectorTab: 'state' | 'transition' | 'workspace' | 'analysis' | 'diagnostics' | 'explanation';
 }
 
@@ -52,7 +54,7 @@ export interface IDockControls {
   resetInspectorWidth: () => void;
   resetBottomPanelHeight: () => void;
   setActiveSidebarTab: (tab: 'explorer' | 'syllabus' | 'quizzes') => void;
-  setActiveBottomTab: (tab: 'trace' | 'matrix' | 'math' | 'batch') => void;
+  setActiveBottomTab: (tab: BottomTabId) => void;
   setActiveInspectorTab: (tab: 'state' | 'transition' | 'workspace' | 'analysis' | 'diagnostics' | 'explanation') => void;
   resetLayout: () => void;
 }
