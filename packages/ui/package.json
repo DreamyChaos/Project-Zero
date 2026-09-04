@@ -1,0 +1,15 @@
+{
+  "name": "@project-zero/ui",
+  "version": "1.0.0",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "dependencies": {
+    "@project-zero/shared": "workspace:*"
+  },
+  "scripts": {
+    "build": "tsc --build",
+    "lint": "eslint \"src/**/*.ts\"",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  }
+}

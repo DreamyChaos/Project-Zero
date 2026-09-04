@@ -1,0 +1,30 @@
+{
+  "name": "project-zero-monorepo",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Project Zero: AI-Powered Interactive Learning Platform for Models of Computation",
+  "scripts": {
+    "build": "turbo run build",
+    "dev": "pnpm --filter @project-zero/web-app dev",
+    "lint": "turbo run lint",
+    "typecheck": "turbo run typecheck",
+    "test": "turbo run test && vitest run api/__tests__ netlify/functions/__tests__",
+    "format": "prettier --write \"**/*.{ts,tsx,md,json}\""
+  },
+  "devDependencies": {
+    "@types/node": "^26.4.1",
+    "@typescript-eslint/eslint-plugin": "^7.10.0",
+    "@typescript-eslint/parser": "^7.10.0",
+    "eslint": "^8.57.0",
+    "playwright": "^1.62.1",
+    "prettier": "^3.2.5",
+    "turbo": "^1.13.0",
+    "typescript": "^5.4.5",
+    "vitest": "^1.6.0"
+  },
+  "engines": {
+    "node": ">=20.0.0",
+    "pnpm": ">=8.0.0"
+  },
+  "packageManager": "pnpm@9.0.0"
+}

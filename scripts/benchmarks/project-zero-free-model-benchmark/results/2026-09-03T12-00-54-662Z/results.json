@@ -1,0 +1,44 @@
+{
+  "benchmarkVersion": "1.0.0",
+  "timestamp": "2026-09-03T12:00:54.662Z",
+  "models": [
+    "moonshotai/kimi-k3",
+    "nvidia/nemotron-3.5-lightning-30b-a3b",
+    "google/gemma-4-31b-it",
+    "nvidia/nemotron-3-super-120b-a12b",
+    "openai/gpt-oss-20b",
+    "nvidia/nemotron-3-ultra-550b-a55b"
+  ],
+  "testsPerModel": 10,
+  "totalExpectedTests": 60,
+  "completedTests": 2,
+  "completed": false,
+  "startedAt": "2026-09-03T12:00:54.662Z",
+  "lastUpdatedAt": "2026-09-03T12:08:59.244Z",
+  "results": [
+    {
+      "model": "moonshotai/kimi-k3",
+      "testId": "TEST_1",
+      "testName": "Simple Definition",
+      "status": "TIMEOUT",
+      "attemptCount": 2,
+      "ttfbMs": "NOT_AVAILABLE",
+      "totalMs": 240025,
+      "outputChars": 0,
+      "error": "Request timed out after 120000ms",
+      "responseText": ""
+    },
+    {
+      "model": "moonshotai/kimi-k3",
+      "testId": "TEST_2",
+      "testName": "DFA/NFA Concept",
+      "status": "TIMEOUT",
+      "attemptCount": 2,
+      "ttfbMs": "NOT_AVAILABLE",
+      "totalMs": 240016,
+      "outputChars": 0,
+      "error": "Request timed out after 120000ms",
+      "responseText": ""
+    }
+  ]
+}

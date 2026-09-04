@@ -1,0 +1,891 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Groundwater Intelligence Platform — Presentation</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600&family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-space: #070B12;
+      --bg-card: #0F172A;
+      --border-card: #1E293B;
+      --cyan: #00F0FF;
+      --green: #10B981;
+      --amber: #F59E0B;
+      --red: #EF4444;
+      --blue-accent: #0284C7;
+      --text-main: #F8FAFC;
+      --text-muted: #94A3B8;
+      --glass-bg: rgba(15, 23, 42, 0.75);
+      --glass-border: rgba(0, 240, 255, 0.2);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-space);
+      color: var(--text-main);
+      font-family: 'Inter', sans-serif;
+      overflow: hidden;
+      height: 100vh;
+      width: 100vw;
+    }
+
+    /* Deck Layout */
+    .deck-container {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .slide {
+      display: none;
+      width: 90vw;
+      max-width: 1333px;
+      height: 85vh;
+      max-height: 750px;
+      background: var(--bg-space);
+      border: 1px solid var(--border-card);
+      border-radius: 16px;
+      padding: 40px 50px;
+      position: relative;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.8);
+      overflow-y: auto;
+    }
+
+    .slide.active {
+      display: flex;
+      flex-direction: column;
+      animation: fadeIn 0.4s ease-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Header */
+    .slide-header {
+      margin-bottom: 24px;
+    }
+
+    .category-tag {
+      font-family: 'Fira Code', monospace;
+      font-size: 0.85rem;
+      color: var(--cyan);
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+
+    .slide-title {
+      font-size: 1.8rem;
+      font-weight: 800;
+      color: var(--text-main);
+      line-height: 1.2;
+    }
+
+    .slide-subtitle {
+      font-size: 1.0rem;
+      color: var(--text-muted);
+      margin-top: 6px;
+    }
+
+    /* Grid Layouts */
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+      flex: 1;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      flex: 1;
+    }
+
+    .grid-4 {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
+      flex: 1;
+    }
+
+    /* Cards */
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-card);
+      border-radius: 12px;
+      padding: 24px;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .card.cyan-glow { border-color: rgba(0, 240, 255, 0.4); box-shadow: 0 0 15px rgba(0, 240, 255, 0.08); }
+    .card.green-glow { border-color: rgba(16, 185, 129, 0.4); box-shadow: 0 0 15px rgba(16, 185, 129, 0.08); }
+    .card.amber-glow { border-color: rgba(245, 158, 11, 0.4); }
+    .card.red-glow { border-color: rgba(239, 68, 68, 0.4); }
+
+    .card-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--cyan);
+      text-transform: uppercase;
+      margin-bottom: 12px;
+      letter-spacing: 0.5px;
+    }
+
+    .card p, .card li {
+      font-size: 0.95rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+
+    .card ul {
+      list-style-type: none;
+    }
+
+    .card li {
+      margin-bottom: 10px;
+      position: relative;
+      padding-left: 18px;
+    }
+
+    .card li::before {
+      content: "•";
+      color: var(--cyan);
+      font-weight: bold;
+      position: absolute;
+      left: 0;
+    }
+
+    /* Controls */
+    .controls {
+      position: fixed;
+      bottom: 25px;
+      right: 40px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      background: var(--glass-bg);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--glass-border);
+      padding: 10px 20px;
+      border-radius: 30px;
+      z-index: 1000;
+    }
+
+    .btn {
+      background: transparent;
+      border: 1px solid var(--cyan);
+      color: var(--cyan);
+      padding: 8px 16px;
+      border-radius: 20px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 0.85rem;
+      transition: all 0.2s ease;
+    }
+
+    .btn:hover {
+      background: var(--cyan);
+      color: var(--bg-space);
+    }
+
+    .slide-counter {
+      font-family: 'Fira Code', monospace;
+      font-size: 0.9rem;
+      color: var(--text-main);
+    }
+
+    /* SVG Graphics */
+    .svg-container {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    svg text {
+      font-family: 'Inter', sans-serif;
+    }
+  </style>
+</head>
+<body>
+
+<div class="deck-container">
+
+  <!-- SLIDE 01: COVER -->
+  <div class="slide active" id="slide-1">
+    <div class="grid-2" style="align-items: center;">
+      <div>
+        <div class="category-tag">01 // GROUNDWATER INTELLIGENCE PLATFORM</div>
+        <h1 class="slide-title" style="font-size: 2.8rem; margin-bottom: 16px;">GROUNDWATER INTELLIGENCE PLATFORM</h1>
+        <p class="slide-subtitle" style="font-size: 1.2rem; color: var(--cyan); margin-bottom: 24px;">
+          A Data-Driven System for Groundwater Monitoring, Mapping & Predictive Decision Support
+        </p>
+        <div class="card cyan-glow" style="padding: 20px; margin-bottom: 20px;">
+          <p style="color: var(--text-main); font-weight: 600; margin-bottom: 8px;">Core Narrative Architecture:</p>
+          <p style="font-family: 'Fira Code', monospace; color: var(--cyan);">SENSE → INTEGRATE → MAP → ANALYZE → PREDICT → DECIDE</p>
+        </div>
+        <p style="color: var(--green); font-size: 0.95rem; font-weight: 600;">
+          Powered by Physical Telemetry, GIS, Remote Sensing & AI/ML
+        </p>
+      </div>
+      <div style="display: flex; justify-content: center;">
+        <svg width="450" height="380" viewBox="0 0 450 380" fill="none">
+          <rect width="450" height="380" rx="16" fill="#0F172A" stroke="#00F0FF" stroke-width="1.5"/>
+          <!-- Subsurface Cross Section Vector Diagram -->
+          <path d="M 30 100 Q 150 70 250 110 T 420 90" stroke="#94A3B8" stroke-width="2" fill="none"/>
+          <text x="40" y="80" fill="#94A3B8" font-size="12">SURFACE TOPOGRAPHY</text>
+          
+          <path d="M 30 180 Q 160 140 280 200 T 420 170" stroke="#0284C7" stroke-width="2" fill="none"/>
+          <text x="40" y="160" fill="#0284C7" font-size="12">SEDIMENTARY OVERBURDEN</text>
+
+          <path d="M 30 220 C 120 190 200 280 420 230 L 420 310 C 200 340 120 270 30 310 Z" fill="rgba(0, 240, 255, 0.25)" stroke="#00F0FF" stroke-width="2"/>
+          <text x="180" y="270" fill="#00F0FF" font-weight="bold" font-size="14">GROUNDWATER AQUIFER LAYER</text>
+
+          <!-- Well sensor line -->
+          <line x1="330" y1="40" x2="330" y2="280" stroke="#EF4444" stroke-width="2" stroke-dasharray="4"/>
+          <circle cx="330" cy="270" r="6" fill="#EF4444"/>
+          <text x="342" y="275" fill="#EF4444" font-size="11" font-weight="bold">FIELD SENSOR NODE</text>
+        </svg>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 02: THE PROBLEM -->
+  <div class="slide" id="slide-2">
+    <div class="slide-header">
+      <div class="category-tag">02 // THE PROBLEM</div>
+      <h2 class="slide-title">GROUNDWATER IS INVISIBLE — ITS IMPACT ISN'T.</h2>
+      <p class="slide-subtitle">Critical challenges in groundwater conservation and depletion management</p>
+    </div>
+    <div class="grid-3">
+      <div class="card red-glow">
+        <div class="card-title" style="color: var(--red);">01 / Aquifer Depletion</div>
+        <p style="color: var(--text-main); font-weight: 700; margin-bottom: 10px;">Unseen Reserve Over-Extraction</p>
+        <ul>
+          <li>Rapid drawdown across agricultural & urban zones.</li>
+          <li>Severe lag in traditional manual well measurements.</li>
+          <li>Subsidence & irreversible storage capacity destruction.</li>
+        </ul>
+      </div>
+      <div class="card amber-glow">
+        <div class="card-title" style="color: var(--amber);">02 / Water Quality Risk</div>
+        <p style="color: var(--text-main); font-weight: 700; margin-bottom: 10px;">Silent Contamination</p>
+        <ul>
+          <li>Rising Electrical Conductivity (EC) & Turbidity levels.</li>
+          <li>pH spikes endangering drinking water & agricultural yield.</li>
+          <li>Lack of continuous temporal contamination tracking.</li>
+        </ul>
+      </div>
+      <div class="card amber-glow">
+        <div class="card-title" style="color: var(--amber);">03 / Blind Decision Making</div>
+        <p style="color: var(--text-main); font-weight: 700; margin-bottom: 10px;">Reactive Management Failure</p>
+        <ul>
+          <li>Policy interventions arrive long after wells run dry.</li>
+          <li>Inability to model future stress under climate variability.</li>
+          <li>Absence of centralized spatial intelligence platform.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 03: THE DATA GAP -->
+  <div class="slide" id="slide-3">
+    <div class="slide-header">
+      <div class="category-tag">03 // THE DATA GAP</div>
+      <h2 class="slide-title">THE DATA EXISTS. THE CONNECTION DOESN'T.</h2>
+      <p class="slide-subtitle">Groundwater data is trapped across isolated, non-interoperable silos</p>
+    </div>
+    <div class="grid-2">
+      <div class="card cyan-glow">
+        <div class="card-title">DISCONNECTED DATA SILOS</div>
+        <ul style="margin-top: 10px;">
+          <li style="margin-bottom: 14px;"><strong>Physical Sensors:</strong> Local well depth, pH, EC & turbidity logs</li>
+          <li style="margin-bottom: 14px;"><strong>Remote Sensing:</strong> Satellite imagery & GRACE gravity data</li>
+          <li style="margin-bottom: 14px;"><strong>Rainfall Logs:</strong> Meteorological precipitation records</li>
+          <li style="margin-bottom: 14px;"><strong>GIS Datasets:</strong> Soil permeability, slope & land cover rasters</li>
+          <li style="margin-bottom: 14px;"><strong>Historical Records:</strong> Legacy paper logs & state hydro-reports</li>
+        </ul>
+      </div>
+      <div class="card red-glow" style="justify-content: center; text-align: center;">
+        <h3 style="color: var(--red); font-size: 1.5rem; margin-bottom: 16px;">THE FRAGMENTATION BOTTLENECK</h3>
+        <p style="font-size: 1.1rem; line-height: 1.6; color: var(--text-main);">
+          Without a centralized software pipeline, decision-makers are forced to rely on partial snapshots, resulting in delayed interventions and uncoordinated water management policies.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 04: OUR VISION -->
+  <div class="slide" id="slide-4">
+    <div class="slide-header">
+      <div class="category-tag">04 // OUR VISION</div>
+      <h2 class="slide-title">ONE PLATFORM. MULTIPLE DATA SOURCES. ONE GROUNDWATER VIEW.</h2>
+      <p class="slide-subtitle">Fusing physical telemetry with spatial environmental intelligence</p>
+    </div>
+    <div class="grid-2">
+      <div class="card cyan-glow">
+        <div class="card-title">UNIFIED PLATFORM CORE</div>
+        <ul>
+          <li><strong>Ground-Truth Telemetry:</strong> Real-time observations from physical IoT nodes (Raspberry Pi 3B+ & ESP32).</li>
+          <li><strong>Remote Sensing Integration:</strong> Broad spatial coverage extending context beyond physical sensor sites.</li>
+          <li><strong>GIS Layer Fusion:</strong> Topography, slope, land cover, and soil characteristics mapped seamlessly.</li>
+          <li><strong>Centralized Data Engine:</strong> Single source of truth feeding spatial analytics and predictive intelligence.</li>
+        </ul>
+      </div>
+      <div class="card green-glow">
+        <div class="card-title" style="color: var(--green);">CORE VALUE NARRATIVE</div>
+        <div style="font-family: 'Fira Code', monospace; font-size: 0.95rem; line-height: 2.0; color: var(--text-main); margin-top: 10px;">
+          <div>1. <span style="color: var(--cyan);">SENSE</span> → Real-time IoT sensor sampling</div>
+          <div>2. <span style="color: var(--cyan);">INTEGRATE</span> → Unified multi-source pipeline</div>
+          <div>3. <span style="color: var(--cyan);">MAP</span> → GIS spatial potential & risk mapping</div>
+          <div>4. <span style="color: var(--cyan);">ANALYZE</span> → Time-series & stress evaluation</div>
+          <div>5. <span style="color: var(--cyan);">PREDICT</span> → AI/ML predictive forecasting</div>
+          <div>6. <span style="color: var(--cyan);">DECIDE</span> → Government decision support</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 05: SYSTEM ARCHITECTURE -->
+  <div class="slide" id="slide-5">
+    <div class="slide-header">
+      <div class="category-tag">05 // SYSTEM ARCHITECTURE</div>
+      <h2 class="slide-title">END-TO-END DATA PIPELINE ARCHITECTURE</h2>
+      <p class="slide-subtitle">From physical edge sampling to executive decision support</p>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 12px; flex: 1;">
+      <div class="card cyan-glow" style="padding: 14px 20px; flex-direction: row; justify-content: space-between; align-items: center;">
+        <span style="font-weight: 700; color: var(--cyan); width: 220px;">01 / PHYSICAL LAYER</span>
+        <span style="color: var(--text-muted); font-size: 0.9rem;">Raspberry Pi 3B+ | ESP32 | 6 Telemetry Sensors | Custom PCB | Physical Aquifer Model</span>
+      </div>
+      <div class="card" style="padding: 14px 20px; flex-direction: row; justify-content: space-between; align-items: center; border-color: var(--blue-accent);">
+        <span style="font-weight: 700; color: var(--blue-accent); width: 220px;">02 / GATEWAY & API</span>
+        <span style="color: var(--text-muted); font-size: 0.9rem;">Data Acquisition Gateway | Hardware Data API | Payload Cleaning & Normalization</span>
+      </div>
+      <div class="card green-glow" style="padding: 14px 20px; flex-direction: row; justify-content: space-between; align-items: center;">
+        <span style="font-weight: 700; color: var(--green); width: 220px;">03 / DATA BASE ENGINE</span>
+        <span style="color: var(--text-muted); font-size: 0.9rem;">Central Database | GIS Spatial Layer Index | Remote Sensing Raster Ingestion</span>
+      </div>
+      <div class="card amber-glow" style="padding: 14px 20px; flex-direction: row; justify-content: space-between; align-items: center;">
+        <span style="font-weight: 700; color: var(--amber); width: 220px;">04 / SPATIAL ANALYTICS</span>
+        <span style="color: var(--text-muted); font-size: 0.9rem;">Groundwater Potential Mapping | Recharge Assessment | Quality Risk Indexing</span>
+      </div>
+      <div class="card red-glow" style="padding: 14px 20px; flex-direction: row; justify-content: space-between; align-items: center;">
+        <span style="font-weight: 700; color: var(--red); width: 220px;">05 / AI/ML PREDICTION</span>
+        <span style="color: var(--text-muted); font-size: 0.9rem;">Predictive Intelligence Layer | Depletion Forecasting | Scenario Modeling</span>
+      </div>
+      <div class="card cyan-glow" style="padding: 14px 20px; flex-direction: row; justify-content: space-between; align-items: center;">
+        <span style="font-weight: 700; color: var(--cyan); width: 220px;">06 / DECISION PLATFORM</span>
+        <span style="color: var(--text-muted); font-size: 0.9rem;">Web Frontend | Interactive GIS Dashboard | Government Decision-Support Reports</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 06: FIELD DATA NODE -->
+  <div class="slide" id="slide-6">
+    <div class="slide-header">
+      <div class="category-tag">06 // FIELD DATA NODE</div>
+      <h2 class="slide-title">HARDWARE DATA-ACQUISITION LAYER</h2>
+      <p class="slide-subtitle">Physical prototype edge setup & gateway architecture</p>
+    </div>
+    <div class="grid-2">
+      <div class="card cyan-glow">
+        <div class="card-title">HARDWARE CORE COMPONENTS</div>
+        <ul>
+          <li><strong>Raspberry Pi 3B+:</strong> Central edge gateway, local payload buffering & API dispatch.</li>
+          <li><strong>ESP32 Microcontroller:</strong> Low-latency sensor analog sampling & digital communication.</li>
+          <li><strong>Custom PCB:</strong> Regulated power delivery, signal filtering & connector bus integration.</li>
+          <li><strong>Pump + Tubing:</strong> Controlled fluid circulation for dynamic sensor payload testing.</li>
+          <li><strong>Physical Groundwater Model:</strong> Aquifer test column for continuous prototype validation.</li>
+        </ul>
+      </div>
+      <div class="card green-glow">
+        <div class="card-title" style="color: var(--green);">HARDWARE POSITIONING & ROLE</div>
+        <p style="font-size: 1.05rem; color: var(--text-main); margin-bottom: 16px;">
+          The physical hardware is the <strong>data ground-truth provider</strong> for the platform, not the complete project by itself.
+        </p>
+        <ul>
+          <li>Continuous edge sampling of water level, pH, EC, turbidity, temperature & soil moisture.</li>
+          <li>Feeds empirical observation into the central database via the Hardware Data API.</li>
+          <li>Validates spatial interpolation and AI/ML predictions against real physical measurements.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 07: SENSOR DATA -->
+  <div class="slide" id="slide-7">
+    <div class="slide-header">
+      <div class="category-tag">07 // SENSOR INSTRUMENTATION</div>
+      <h2 class="slide-title">TELEMETRY SENSOR PAYLOAD</h2>
+      <p class="slide-subtitle">Physical parameters captured at the monitoring wellhead</p>
+    </div>
+    <div class="grid-3">
+      <div class="card cyan-glow">
+        <div class="card-title">Groundwater Level</div>
+        <p style="color: var(--text-main); font-weight: 600;">Ultrasonic / Depth Probe</p>
+        <p style="margin-top: 10px;">Tracks real-time water table height & seasonal drawdown.</p>
+      </div>
+      <div class="card green-glow">
+        <div class="card-title" style="color: var(--green);">pH Sensor</div>
+        <p style="color: var(--text-main); font-weight: 600;">Electrochemical Electrode</p>
+        <p style="margin-top: 10px;">Monitors acidity/alkalinity for potability & safety standards.</p>
+      </div>
+      <div class="card amber-glow">
+        <div class="card-title" style="color: var(--amber);">Electrical Conductivity</div>
+        <p style="color: var(--text-main); font-weight: 600;">EC Conductivity Probe</p>
+        <p style="margin-top: 10px;">Detects total dissolved solids & agricultural salinization.</p>
+      </div>
+      <div class="card red-glow">
+        <div class="card-title" style="color: var(--red);">Turbidity Sensor</div>
+        <p style="color: var(--text-main); font-weight: 600;">Optical Scattering Probe</p>
+        <p style="margin-top: 10px;">Measures suspended solids & sedimentation ingress.</p>
+      </div>
+      <div class="card">
+        <div class="card-title" style="color: var(--blue-accent);">Temperature Sensor</div>
+        <p style="color: var(--text-main); font-weight: 600;">Digital Thermal Probe</p>
+        <p style="margin-top: 10px;">Measures water & ambient thermal variance.</p>
+      </div>
+      <div class="card">
+        <div class="card-title">Soil-Moisture Sensor</div>
+        <p style="color: var(--text-main); font-weight: 600;">Capacitive Moisture Sensor</p>
+        <p style="margin-top: 10px;">Evaluates surface infiltration readiness for recharge.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 08: GIS INTERACTIVE MAP -->
+  <div class="slide" id="slide-8">
+    <div class="slide-header">
+      <div class="category-tag">08 // GIS INTERACTIVE MAP</div>
+      <h2 class="slide-title">SPATIAL INTELLIGENCE & GEOSPATIAL MAPPING</h2>
+      <p class="slide-subtitle">Multi-resolution geographic visualization engine</p>
+    </div>
+    <div class="grid-2">
+      <div class="card cyan-glow">
+        <div class="card-title">GIS LAYER CAPABILITIES</div>
+        <ul>
+          <li><strong>Multi-Layer Geospatial Overlay:</strong> Seamless integration of well telemetry, administrative borders, terrain contours, and watershed basins.</li>
+          <li><strong>Interactive Spatial Queries:</strong> Clickable well nodes displaying live depth history, pH trends, and stress scores.</li>
+          <li><strong>Raster Processing:</strong> High-performance rendering of satellite rasters alongside point vector data.</li>
+          <li><strong>Spatial Interpolation:</strong> Heatmap interpolation across unmonitored regions between physical wells.</li>
+        </ul>
+      </div>
+      <div class="card" style="padding: 0; overflow: hidden; display: flex; justify-content: center; align-items: center; border-color: var(--cyan);">
+        <!-- SVG Vector GIS Map Mockup -->
+        <svg width="100%" height="100%" viewBox="0 0 500 350" fill="none">
+          <rect width="500" height="350" fill="#0B0F19"/>
+          <!-- Grid lines -->
+          <path d="M 0 50 H 500 M 0 100 H 500 M 0 150 H 500 M 0 200 H 500 M 0 250 H 500 M 0 300 H 500" stroke="#1E293B" stroke-width="1"/>
+          <path d="M 50 0 V 350 M 100 0 V 350 M 150 0 V 350 M 200 0 V 350 M 250 0 V 350 M 300 0 V 350 M 350 0 V 350 M 400 0 V 350 M 450 0 V 350" stroke="#1E293B" stroke-width="1"/>
+          <!-- Contour lines -->
+          <ellipse cx="250" cy="180" rx="180" ry="110" stroke="#0284C7" stroke-width="1.5" fill="none" opacity="0.6"/>
+          <ellipse cx="250" cy="180" rx="120" ry="70" stroke="#00F0FF" stroke-width="1.5" fill="rgba(0,240,255,0.05)"/>
+          <ellipse cx="250" cy="180" rx="60" ry="35" stroke="#10B981" stroke-width="1.5" fill="rgba(16,185,129,0.15)"/>
+          <!-- Nodes -->
+          <circle cx="250" cy="180" r="7" fill="#10B981"/>
+          <circle cx="150" cy="140" r="6" fill="#00F0FF"/>
+          <circle cx="320" cy="220" r="6" fill="#F59E0B"/>
+          <circle cx="370" cy="120" r="6" fill="#EF4444"/>
+          <text x="20" y="330" fill="#00F0FF" font-weight="bold" font-size="12">GIS SPATIAL INTERPOLATION ENGINE</text>
+        </svg>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 09: REMOTE SENSING -->
+  <div class="slide" id="slide-9">
+    <div class="slide-header">
+      <div class="category-tag">09 // REMOTE SENSING & SATELLITE DATA</div>
+      <h2 class="slide-title">EXPANDING COVERAGE BEYOND SENSOR NODES</h2>
+      <p class="slide-subtitle">Satellite observation and macro environmental data fusion</p>
+    </div>
+    <div class="grid-3">
+      <div class="card cyan-glow">
+        <div class="card-title">Satellite Imagery</div>
+        <p style="color: var(--text-main); font-weight: 600; margin-bottom: 8px;">Multi-Spectral Observation</p>
+        <p>Optical & radar satellite data for surface soil moisture and vegetation health (NDVI) monitoring.</p>
+      </div>
+      <div class="card green-glow">
+        <div class="card-title" style="color: var(--green);">Environmental Logs</div>
+        <p style="color: var(--text-main); font-weight: 600; margin-bottom: 8px;">Macro Data Integration</p>
+        <p>Continuous ingestion of precipitation, temperature, evapotranspiration, and humidity datasets.</p>
+      </div>
+      <div class="card amber-glow">
+        <div class="card-title" style="color: var(--amber);">Spatial Gap Filling</div>
+        <p style="color: var(--text-main); font-weight: 600; margin-bottom: 8px;">Aquifer-Scale Context</p>
+        <p>Connects isolated well points to regional aquifer dynamics without requiring thousands of physical sensors.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 10: GROUNDWATER POTENTIAL MAPPING -->
+  <div class="slide" id="slide-10">
+    <div class="slide-header">
+      <div class="category-tag">10 // GROUNDWATER POTENTIAL MAPPING</div>
+      <h2 class="slide-title">MULTI-CRITERIA GROUNDWATER AVAILABILITY ASSESSMENT</h2>
+      <p class="slide-subtitle">Overlaying spatial factors to assess subsurface storage potential</p>
+    </div>
+    <div class="card cyan-glow" style="flex: 1;">
+      <div class="card-title">SPATIAL WEIGHTED OVERLAY MATRIX</div>
+      <p style="color: var(--text-main); margin-bottom: 16px;">
+        Assessment Model: Potential Index = f(Rainfall, Soil Permeability, Slope, Land Cover, Drainage Density, Ground Truth)
+      </p>
+      <div class="grid-2" style="gap: 16px;">
+        <div class="card" style="background: rgba(7,11,18,0.5);">
+          <p style="color: var(--cyan); font-weight: 700;">Topography & Slope</p>
+          <p style="font-size: 0.9rem;">Flatter terrain promotes surface water ponding and infiltration over rapid surface runoff.</p>
+        </div>
+        <div class="card" style="background: rgba(7,11,18,0.5);">
+          <p style="color: var(--green); font-weight: 700;">Soil Permeability</p>
+          <p style="font-size: 0.9rem;">Porous sandy soils enable significantly higher percolation rates than impermeable clay.</p>
+        </div>
+        <div class="card" style="background: rgba(7,11,18,0.5);">
+          <p style="color: var(--amber); font-weight: 700;">Drainage Density</p>
+          <p style="font-size: 0.9rem;">Lower stream density indicates higher subsurface absorption and storage potential.</p>
+        </div>
+        <div class="card" style="background: rgba(7,11,18,0.5);">
+          <p style="color: var(--blue-accent); font-weight: 700;">Land Cover & Vegetation (NDVI)</p>
+          <p style="font-size: 0.9rem;">Dense vegetation enhances root-zone soil porosity and shields soil from direct evaporation.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 11: RECHARGE-POTENTIAL MAPPING -->
+  <div class="slide" id="slide-11">
+    <div class="slide-header">
+      <div class="category-tag">11 // RECHARGE-POTENTIAL MAPPING</div>
+      <h2 class="slide-title">IDENTIFYING OPTIMAL GROUNDWATER RECHARGE ZONES</h2>
+      <p class="slide-subtitle">Guiding artificial & natural recharge intervention programs</p>
+    </div>
+    <div class="grid-2">
+      <div class="card green-glow">
+        <div class="card-title" style="color: var(--green);">INFILTRATION & RECHARGE FACTORS</div>
+        <ul>
+          <li>Precipitation intensity, frequency & seasonal duration.</li>
+          <li>Hydraulic conductivity of surface soil layers.</li>
+          <li>Geological lithology & fracture zone connectivity.</li>
+          <li>Surface slope & surface runoff retention time.</li>
+          <li>Pre-monsoon soil moisture saturation baseline.</li>
+        </ul>
+      </div>
+      <div class="card cyan-glow">
+        <div class="card-title">ACTIONABLE INTERVENTIONS</div>
+        <ul>
+          <li><strong>Check Dam Selection:</strong> Pinpoint high-percolation sites for check dams.</li>
+          <li><strong>Recharge Shafts:</strong> Locate optimal coordinates for rainwater injection wells.</li>
+          <li><strong>Urban Harvesting:</strong> Guide municipal rainwater harvesting enforcement mandates.</li>
+          <li><strong>Watershed Protection:</strong> Designate protected high-recharge conservation zones.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 12: WATER-QUALITY RISK MAPPING -->
+  <div class="slide" id="slide-12">
+    <div class="slide-header">
+      <div class="category-tag">12 // WATER-QUALITY RISK MAPPING</div>
+      <h2 class="slide-title">SPATIAL WATER-QUALITY RISK INDEXING</h2>
+      <p class="slide-subtitle">Converting well telemetry into actionable contamination heatmaps</p>
+    </div>
+    <div class="grid-3" style="margin-bottom: 20px;">
+      <div class="card cyan-glow">
+        <div class="card-title">pH Spatial Risk</div>
+        <p>Maps agricultural chemical runoff, industrial effluent leaching & acid mine drainage zones.</p>
+      </div>
+      <div class="card amber-glow">
+        <div class="card-title" style="color: var(--amber);">EC Risk Index</div>
+        <p>Tracks salinization trends, mineral dissolving & coastal saltwater intrusion boundaries.</p>
+      </div>
+      <div class="card red-glow">
+        <div class="card-title" style="color: var(--red);">Turbidity Index</div>
+        <p>Flags wellhead structural failures, siltation ingress & filtration collapse.</p>
+      </div>
+    </div>
+    <div class="card green-glow">
+      <div class="card-title" style="color: var(--green);">INTEGRATED QUALITY RISK SCORE</div>
+      <p style="color: var(--text-main);">
+        Spatial interpolation synthesizes pH, EC, and Turbidity into a unified Risk Index (Safe / Caution / Hazardous) to issue preventive alerts before contaminated water reaches community supply grids.
+      </p>
+    </div>
+  </div>
+
+  <!-- SLIDE 13: HISTORICAL TREND ANALYSIS -->
+  <div class="slide" id="slide-13">
+    <div class="slide-header">
+      <div class="category-tag">13 // HISTORICAL TREND ANALYSIS</div>
+      <h2 class="slide-title">TIME-SERIES TEMPORAL EVALUATION</h2>
+      <p class="slide-subtitle">Evaluating long-term drawdown trajectories & seasonal recovery</p>
+    </div>
+    <div class="card cyan-glow" style="flex: 1;">
+      <div class="card-title">KEY TEMPORAL ANALYTICAL DIMENSIONS</div>
+      <ul>
+        <li><strong>Seasonal Water-Table Fluctuations:</strong> Comparing annual monsoon recharge recovery against summer drawdown extraction.</li>
+        <li><strong>Multi-Year Depletion Trajectories:</strong> Detecting subtle, persistent negative baseline drift across multi-year periods.</li>
+        <li><strong>Rainfall-Recharge Lag Quantifying:</strong> Calculating the exact time-lag between monsoon precipitation and water table response.</li>
+        <li><strong>Anomalous Extraction Spikes:</strong> Flagging unseasonal rapid drops caused by unmonitored over-pumping.</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- SLIDE 14: GROUNDWATER DEPLETION / STRESS -->
+  <div class="slide" id="slide-14">
+    <div class="slide-header">
+      <div class="category-tag">14 // GROUNDWATER DEPLETION & STRESS ZONES</div>
+      <h2 class="slide-title">IDENTIFYING CRITICAL DEPLETION THRESHOLDS</h2>
+      <p class="slide-subtitle">Categorizing aquifers by depletion speed & recovery deficit</p>
+    </div>
+    <div class="grid-2">
+      <div class="card amber-glow">
+        <div class="card-title" style="color: var(--amber);">STRESS CLASSIFICATION MATRIX</div>
+        <ul>
+          <li><strong style="color: var(--green);">Safe Zone:</strong> Stable water table, positive annual recharge balance.</li>
+          <li><strong style="color: var(--amber);">Semi-Critical Zone:</strong> Drawdown trend detected, extraction equals recharge.</li>
+          <li><strong style="color: var(--red);">Critical Stress Zone:</strong> Severe drawdown, extraction exceeds recharge by >20%.</li>
+          <li><strong style="color: #FF0055;">Over-Exploited Zone:</strong> Irreversible storage decline & subsidence risk.</li>
+        </ul>
+      </div>
+      <div class="card red-glow">
+        <div class="card-title" style="color: var(--red);">EARLY WARNING METRICS</div>
+        <ul>
+          <li><strong>Rate of Drawdown (m/year):</strong> Accelerating annual water depth decline.</li>
+          <li><strong>Recharge Deficit Percentage:</strong> Unreplenished volume per extraction cycle.</li>
+          <li><strong>Quality Degradation Rate:</strong> Concurrent rise in EC/salinity alongside drawdown.</li>
+          <li><strong>Infrastructure Vulnerability:</strong> Threat level to municipal water intake wells.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 15: AI / ML ENGINE -->
+  <div class="slide" id="slide-15">
+    <div class="slide-header">
+      <div class="category-tag">15 // AI / ML PREDICTION ENGINE</div>
+      <h2 class="slide-title">PREDICTIVE INTELLIGENCE LAYER (ALGORITHM AGNOSTIC)</h2>
+      <p class="slide-subtitle">Modular framework for predictive groundwater stress modeling</p>
+    </div>
+    <div class="card cyan-glow" style="margin-bottom: 20px;">
+      <p style="color: var(--text-main); font-size: 0.95rem; line-height: 1.5;">
+        <strong>Model Architecture Strategy:</strong> Described generically as an <em>AI/ML Prediction Engine</em>. Specific predictive algorithms will be benchmarked and selected later based on dataset spatial-temporal resolution, feature completeness, and empirical validation metrics.
+      </p>
+    </div>
+    <div class="grid-2">
+      <div class="card" style="border-color: var(--blue-accent);">
+        <div class="card-title" style="color: var(--blue-accent);">FEATURE PIPELINE INPUTS</div>
+        <ul>
+          <li>Historical Water Level Time Series</li>
+          <li>Precipitation & Evapotranspiration Data</li>
+          <li>Soil Moisture & Satellite NDVI Rasters</li>
+          <li>Geological Lithology & Infiltration Rates</li>
+          <li>Real-Time IoT Sensor Telemetry Feeds</li>
+        </ul>
+      </div>
+      <div class="card green-glow">
+        <div class="card-title" style="color: var(--green);">PREDICTIVE OUTPUTS</div>
+        <ul>
+          <li>30 / 60 / 90-Day Water Level Forecasts</li>
+          <li>Depletion Risk Probability Distribution</li>
+          <li>Recharge Deficit Rate Predictions</li>
+          <li>Water Quality Risk Trend Horizon</li>
+          <li>Uncertainty Bounds & Confidence Intervals</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 16: FUTURE GROUNDWATER-STRESS PREDICTION -->
+  <div class="slide" id="slide-16">
+    <div class="slide-header">
+      <div class="category-tag">16 // FUTURE STRESS PREDICTION</div>
+      <h2 class="slide-title">SCENARIO-BASED STRESS FORECASTING</h2>
+      <p class="slide-subtitle">Simulating groundwater behavior under climate variability and extraction demand</p>
+    </div>
+    <div class="grid-3">
+      <div class="card green-glow">
+        <div class="card-title" style="color: var(--green);">Baseline Scenario</div>
+        <p style="color: var(--text-main); font-weight: 600; margin-bottom: 8px;">Normal Precipitation & Pumping</p>
+        <p>Projects baseline water table behavior under historical average seasonal rainfall.</p>
+      </div>
+      <div class="card amber-glow">
+        <div class="card-title" style="color: var(--amber);">Monsoon Deficit</div>
+        <p style="color: var(--text-main); font-weight: 600; margin-bottom: 8px;">Below-Average Rainfall (-30%)</p>
+        <p>Forecasts accelerated drawdown speed during drought years to prepare buffer reserves.</p>
+      </div>
+      <div class="card red-glow">
+        <div class="card-title" style="color: var(--red);">High Extraction</div>
+        <p style="color: var(--text-main); font-weight: 600; margin-bottom: 8px;">Pumping Expansion (+25%)</p>
+        <p>Simulates aquifer stress under aggressive agricultural or municipal pumping growth.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 17: DECISION-SUPPORT DASHBOARD -->
+  <div class="slide" id="slide-17">
+    <div class="slide-header">
+      <div class="category-tag">17 // DECISION-SUPPORT DASHBOARD</div>
+      <h2 class="slide-title">GOVERNMENT DECISION-SUPPORT INTERFACE</h2>
+      <p class="slide-subtitle">Translating complex spatial data into policy interventions</p>
+    </div>
+    <div class="grid-4">
+      <div class="card cyan-glow">
+        <div class="card-title">01 / Regional Status Overview</div>
+        <p>Real-time view of regional water table health, active well count & live telemetry status.</p>
+      </div>
+      <div class="card green-glow">
+        <div class="card-title" style="color: var(--green);">02 / Recharge Priority Map</div>
+        <p>Geospatial highlighting of top-priority zones for check dams & artificial injection shafts.</p>
+      </div>
+      <div class="card amber-glow">
+        <div class="card-title" style="color: var(--amber);">03 / Contamination Warnings</div>
+        <p>Automated warnings for regions exceeding safe pH, EC, or turbidity thresholds.</p>
+      </div>
+      <div class="card red-glow">
+        <div class="card-title" style="color: var(--red);">04 / Depletion Forecasting</div>
+        <p>Interactive slider to visualize projected groundwater stress over 1–5 year horizons.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 18: COMPLETE DIGITAL PLATFORM -->
+  <div class="slide" id="slide-18">
+    <div class="slide-header">
+      <div class="category-tag">18 // COMPLETE DIGITAL PLATFORM</div>
+      <h2 class="slide-title">WEB APPLICATION MODULE MATRIX</h2>
+      <p class="slide-subtitle">Modular architecture supporting multi-stakeholder workflows</p>
+    </div>
+    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; flex: 1;">
+      <div class="card cyan-glow"><div class="card-title">Overview Dashboard</div><p style="font-size:0.85rem;">System-wide telemetry summary</p></div>
+      <div class="card cyan-glow"><div class="card-title">Interactive GIS Map</div><p style="font-size:0.85rem;">Spatial multi-layer explorer</p></div>
+      <div class="card cyan-glow"><div class="card-title">Live Telemetry Feeds</div><p style="font-size:0.85rem;">Real-time IoT well payload</p></div>
+      <div class="card green-glow"><div class="card-title" style="color: var(--green);">Groundwater Potential</div><p style="font-size:0.85rem;">Availability scoring matrix</p></div>
+      <div class="card green-glow"><div class="card-title" style="color: var(--green);">Water Quality Index</div><p style="font-size:0.85rem;">pH / EC / Turbidity risk map</p></div>
+      <div class="card green-glow"><div class="card-title" style="color: var(--green);">Recharge Potential</div><p style="font-size:0.85rem;">Infiltration site selection</p></div>
+      <div class="card amber-glow"><div class="card-title" style="color: var(--amber);">Historical Trends</div><p style="font-size:0.85rem;">Time-series drawdown logs</p></div>
+      <div class="card red-glow"><div class="card-title" style="color: var(--red);">AI Stress Forecasts</div><p style="font-size:0.85rem;">Predictive risk simulation</p></div>
+      <div class="card"><div class="card-title" style="color: var(--blue-accent);">Government Reports</div><p style="font-size:0.85rem;">Policy PDF export engine</p></div>
+    </div>
+  </div>
+
+  <!-- SLIDE 19: TECHNOLOGY STACK -->
+  <div class="slide" id="slide-19">
+    <div class="slide-header">
+      <div class="category-tag">19 // TECHNOLOGY & AI STACK</div>
+      <h2 class="slide-title">TECHNOLOGY & AI MODEL STACK</h2>
+      <p class="slide-subtitle">Integrated stack powering sensing, analytics, reasoning & presentation</p>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 12px; flex: 1;">
+      <div class="card cyan-glow" style="padding: 14px 20px; flex-direction: row; justify-content: space-between;">
+        <span style="font-weight: 700; color: var(--cyan); width: 220px;">HARDWARE LAYER</span>
+        <span style="color: var(--text-main); font-size: 0.95rem;">Raspberry Pi 3B+, ESP32 Microcontroller, 6 Telemetry Sensors, Custom PCB</span>
+      </div>
+      <div class="card green-glow" style="padding: 14px 20px; flex-direction: row; justify-content: space-between;">
+        <span style="font-weight: 700; color: var(--green); width: 220px;">BACKEND & DATABASE</span>
+        <span style="color: var(--text-main); font-size: 0.95rem;">Python Server, Relational & Spatial Database, REST Hardware API</span>
+      </div>
+      <div class="card" style="padding: 14px 20px; flex-direction: row; justify-content: space-between; border-color: var(--blue-accent);">
+        <span style="font-weight: 700; color: var(--blue-accent); width: 220px;">GIS & REMOTE SENSING</span>
+        <span style="color: var(--text-main); font-size: 0.95rem;">Geospatial Engine, Multi-Spectral Satellite Rasters, Vector Overlay</span>
+      </div>
+      <div class="card amber-glow" style="padding: 14px 20px; flex-direction: row; justify-content: space-between;">
+        <span style="font-weight: 700; color: var(--amber); width: 220px;">AI/ML ENGINE</span>
+        <span style="color: var(--text-main); font-size: 0.95rem;">Predictive Intelligence Layer, Feature Pipeline, Time-Series Forecasting</span>
+      </div>
+      <div class="card red-glow" style="padding: 14px 20px; flex-direction: row; justify-content: space-between;">
+        <span style="font-weight: 700; color: var(--red); width: 220px;">NVIDIA AI & NIM STACK</span>
+        <span style="color: var(--text-main); font-size: 0.95rem;">NVIDIA Nemotron-3-Ultra-550B-A55B (Reasoning) | FLUX.1-dev (Visuals)</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 20: FUTURE SCOPE / CLOSING -->
+  <div class="slide" id="slide-20">
+    <div class="slide-header">
+      <div class="category-tag">20 // FUTURE SCOPE & ROADMAP</div>
+      <h2 class="slide-title">SCALING TO REGIONAL GROUNDWATER INTELLIGENCE</h2>
+      <p class="slide-subtitle">Progression roadmap from prototype node to basin-wide deployment</p>
+    </div>
+    <div class="grid-2" style="margin-bottom: 20px;">
+      <div class="card cyan-glow">
+        <div class="card-title">PROGRESSION PHASES</div>
+        <ul>
+          <li><strong>Phase 1: Prototype Node</strong> — Edge hardware & core platform validation.</li>
+          <li><strong>Phase 2: Field Sensor Net</strong> — Multi-node well array across target watershed.</li>
+          <li><strong>Phase 3: Multi-Location Scale</strong> — Expanding hardware gateways across hydro-geologies.</li>
+          <li><strong>Phase 4: Remote Sensing Fusion</strong> — Automated high-res satellite raster ingestion.</li>
+          <li><strong>Phase 5: AI Prediction</strong> — Model training & validation on multi-year temporal logs.</li>
+          <li><strong>Phase 6: Regional Intelligence</strong> — Basin-wide government decision support.</li>
+        </ul>
+      </div>
+      <div class="card green-glow" style="justify-content: center; text-align: center;">
+        <h3 style="color: var(--cyan); font-size: 1.6rem; font-weight: 800; margin-bottom: 16px;">
+          "FROM DATA TO GROUNDWATER INTELLIGENCE."
+        </h3>
+        <p style="color: var(--text-main); font-size: 1.05rem; line-height: 1.6;">
+          Transforming fragmented physical, geospatial, and satellite measurements into actionable, predictive intelligence for sustainable water management.
+        </p>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Navigation Controls -->
+<div class="controls">
+  <button class="btn" id="prevBtn" onclick="changeSlide(-1)">◄ PREV</button>
+  <span class="slide-counter" id="slideCounter">1 / 20</span>
+  <button class="btn" id="nextBtn" onclick="changeSlide(1)">NEXT ►</button>
+</div>
+
+<script>
+  let currentSlide = 1;
+  const totalSlides = 20;
+
+  function showSlide(n) {
+    if (n < 1) currentSlide = 1;
+    else if (n > totalSlides) currentSlide = totalSlides;
+    else currentSlide = n;
+
+    document.querySelectorAll('.slide').forEach((slide, idx) => {
+      slide.classList.remove('active');
+      if (idx === currentSlide - 1) {
+        slide.classList.add('active');
+      }
+    });
+
+    document.getElementById('slideCounter').innerText = `${currentSlide} / ${totalSlides}`;
+  }
+
+  function changeSlide(step) {
+    showSlide(currentSlide + step);
+  }
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowRight' || e.key === ' ') {
+      changeSlide(1);
+    } else if (e.key === 'ArrowLeft') {
+      changeSlide(-1);
+    }
+  });
+</script>
+
+</body>
+</html>
