@@ -305,7 +305,7 @@ export const PUMPING_PRESETS: Record<string, PumpingPresetDefinition> = {
       return { isMember: false, reason: 'Contains non-a character' };
     },
     regex: 'a*',
-    structuralAnalysis: (_p) =>
+    structuralAnalysis: () =>
       `For any valid decomposition where y = aᵏ (k ≥ 1), pumping xyⁱz yields aᵖ⁺⁽ⁱ⁻¹⁾ᵏ, which is always in a* for all i ≥ 0. This satisfies the Pumping Lemma.`,
   },
 
@@ -324,7 +324,7 @@ export const PUMPING_PRESETS: Record<string, PumpingPresetDefinition> = {
       return { isMember: false, reason: 'Does not match (ab)* pattern' };
     },
     regex: '(ab)*',
-    structuralAnalysis: (_p) =>
+    structuralAnalysis: () =>
       `For witness (ab)ᵖ with p=4, choosing x=ε, y=ab, z=(ab)ᵖ⁻¹ gives |xy|=2 ≤ p and |y|=2 > 0. For every i ≥ 0, xyⁱz = (ab)ⁱ(ab)ᵖ⁻¹ = (ab)ᵖ⁺ⁱ⁻¹ ∈ L.`,
   },
 };

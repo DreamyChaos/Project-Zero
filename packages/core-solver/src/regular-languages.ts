@@ -38,7 +38,7 @@ export function extractAlphabet(graph: SolverGraphInput): string[] {
  */
 export function analyzeLanguageFiniteness(
   graph: SolverGraphInput,
-  _machineType: AutomatonType = 'DFA'
+  _machineType?: AutomatonType
 ): LanguageFinitenessResult {
   if (graph.nodes.length === 0) {
     return {

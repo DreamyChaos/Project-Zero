@@ -23,6 +23,9 @@ import {
   REQUIRED_NVIDIA_MODEL,
   AIContextSnapshot,
   extractActionProposal,
+  ChatResponse,
+  GatewayErrorResponse,
+  ChatMessage,
 } from './index';
 
 describe('Phase 9, 10 & 11 — NVIDIA Nemotron AI Gateway & AI Tutor', () => {
@@ -35,7 +38,7 @@ describe('Phase 9, 10 & 11 — NVIDIA Nemotron AI Gateway & AI Tutor', () => {
       expect(() => {
         new NvidiaProvider({
           apiKey: 'test-key',
-          model: 'openai/gpt-4' as any,
+          model: 'openai/gpt-4',
         });
       }).toThrow('is not authorized or enabled in Project Zero model registry');
     });
@@ -66,7 +69,7 @@ describe('Phase 9, 10 & 11 — NVIDIA Nemotron AI Gateway & AI Tutor', () => {
     it('6. rejects invalid message roles', () => {
       expect(() =>
         validateChatRequest({
-          messages: [{ role: 'hacker' as any, content: 'Hello' }],
+          messages: [{ role: 'hacker' as unknown as ChatMessage['role'], content: 'Hello' }],
         })
       ).toThrow('Invalid role "hacker"');
     });
@@ -192,7 +195,7 @@ describe('Phase 9, 10 & 11 — NVIDIA Nemotron AI Gateway & AI Tutor', () => {
       const provider = new NvidiaProvider({
         apiKey: 'nvapi-mock-token',
         model: REQUIRED_NVIDIA_MODEL,
-        fetchFn: mockFetch as any,
+        fetchFn: mockFetch as unknown as typeof fetch,
       });
 
       const result = await provider.chat({
@@ -246,7 +249,7 @@ describe('Phase 9, 10 & 11 — NVIDIA Nemotron AI Gateway & AI Tutor', () => {
 
       const provider = new NvidiaProvider({
         apiKey: 'nvapi-mock-token',
-        fetchFn: mockFetch as any,
+        fetchFn: mockFetch as unknown as typeof fetch,
       });
 
       await expect(
@@ -261,7 +264,7 @@ describe('Phase 9, 10 & 11 — NVIDIA Nemotron AI Gateway & AI Tutor', () => {
     it('14. returns 400 for validation errors', async () => {
       const response = await handleChatRequest({ messages: [] });
       expect(response.status).toBe(400);
-      expect((response.body as any).error.type).toBe('validation_error');
+      expect((response.body as GatewayErrorResponse).error.type).toBe('validation_error');
     });
 
     it('15. returns 500 for missing API key configuration', async () => {
@@ -270,7 +273,7 @@ describe('Phase 9, 10 & 11 — NVIDIA Nemotron AI Gateway & AI Tutor', () => {
         { providerConfig: { apiKey: '' } }
       );
       expect(response.status).toBe(500);
-      expect((response.body as any).error.type).toBe('config_error');
+      expect((response.body as GatewayErrorResponse).error.type).toBe('config_error');
     });
 
     it('16. returns 200 with chat response on success', async () => {
@@ -283,11 +286,11 @@ describe('Phase 9, 10 & 11 — NVIDIA Nemotron AI Gateway & AI Tutor', () => {
 
       const response = await handleChatRequest(
         { messages: [{ role: 'user', content: 'Hi' }] },
-        { providerConfig: { apiKey: 'nvapi-mock-token', fetchFn: mockFetch as any } }
+        { providerConfig: { apiKey: 'nvapi-mock-token', fetchFn: mockFetch as unknown as typeof fetch } }
       );
 
       expect(response.status).toBe(200);
-      expect((response.body as any).message.content).toBe('Hello from Nemotron AI Tutor!');
+      expect((response.body as ChatResponse).message.content).toBe('Hello from Nemotron AI Tutor!');
     });
   });
 
@@ -309,7 +312,7 @@ describe('Phase 9, 10 & 11 — NVIDIA Nemotron AI Gateway & AI Tutor', () => {
 
       const provider = new NvidiaProvider({
         apiKey: 'nvapi-mock-token',
-        fetchFn: mockFetch as any,
+        fetchFn: mockFetch as unknown as typeof fetch,
       });
 
       const res = await provider.chat({
@@ -340,7 +343,7 @@ describe('Phase 9, 10 & 11 — NVIDIA Nemotron AI Gateway & AI Tutor', () => {
 
       const provider = new NvidiaProvider({
         apiKey: 'nvapi-mock-token',
-        fetchFn: mockFetch as any,
+        fetchFn: mockFetch as unknown as typeof fetch,
       });
 
       const res = await provider.chat({

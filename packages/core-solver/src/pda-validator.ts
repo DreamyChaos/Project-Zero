@@ -247,7 +247,7 @@ export function isPDATransitionApplicable(
  */
 export function analyzePDADeterminism(
   graph: SolverGraphInput,
-  _initialStackSymbol: string = 'Z0'
+  _initialStackSymbol?: string
 ): PDADeterminismAnalysis {
   const conflicts: PDADeterminismConflict[] = [];
   const nondeterministicStatesSet = new Set<string>();

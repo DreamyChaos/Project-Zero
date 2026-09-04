@@ -12,6 +12,28 @@ export interface NvidiaProviderConfig {
   fetchFn?: typeof fetch;
 }
 
+interface NvidiaChoice {
+  message?: {
+    role?: string;
+    content?: string | null;
+  };
+}
+
+interface NvidiaChatCompletionResponse {
+  id?: string;
+  choices?: NvidiaChoice[];
+  usage?: {
+    prompt_tokens?: number;
+    completion_tokens?: number;
+    total_tokens?: number;
+  };
+  error?: {
+    message?: string;
+    type?: string;
+    code?: string | number;
+  };
+}
+
 export class NvidiaProvider {
   private apiKey: string;
   private baseUrl: string;
@@ -19,9 +41,10 @@ export class NvidiaProvider {
   private fetchFn: typeof fetch;
 
   constructor(config?: NvidiaProviderConfig) {
-    const envApiKey = typeof globalThis !== 'undefined' && (globalThis as any).process?.env?.NVIDIA_API_KEY
-      ? (globalThis as any).process.env.NVIDIA_API_KEY
-      : '';
+    const envApiKey =
+      typeof process !== 'undefined' && typeof process.env?.NVIDIA_API_KEY === 'string'
+        ? process.env.NVIDIA_API_KEY
+        : '';
     this.apiKey = config?.apiKey !== undefined ? config.apiKey : envApiKey;
     this.baseUrl = config?.baseUrl || 'https://integrate.api.nvidia.com/v1';
     this.model = config?.model || DEFAULT_ROUTED_MODEL;
@@ -87,7 +110,7 @@ export class NvidiaProvider {
     if (!response.ok) {
       let errorDetail = `Status ${response.status}`;
       try {
-        const errorJson = await response.json();
+        const errorJson = (await response.json()) as NvidiaChatCompletionResponse | null;
         if (errorJson?.error?.message) {
           errorDetail = errorJson.error.message;
         }
@@ -105,7 +128,7 @@ export class NvidiaProvider {
     }
 
     // 5. Parse response
-    const json = await response.json();
+    const json = (await response.json()) as NvidiaChatCompletionResponse;
     const choice = json.choices?.[0];
     if (!choice || !choice.message || typeof choice.message.content !== 'string') {
       throw new Error('Malformed response received from NVIDIA inference endpoint.');

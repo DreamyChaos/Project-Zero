@@ -362,7 +362,7 @@ export function simulateBoundedEnumerator(
 ): EnumeratorSimulationResult {
   const sortedAlphabet = [...alphabet].sort();
   const emittedWords: string[] = [];
-  let candidateQueue: string[] = [''];
+  const candidateQueue: string[] = [''];
   let testedCandidateCount = 0;
   const maxCandidatesToTest = 100;
 

@@ -52,7 +52,7 @@ export function extractTMTransducerOutput(
   const maxIdx = nonBlankIndices[nonBlankIndices.length - 1];
 
   let start = minIdx;
-  let end = maxIdx;
+  const end = maxIdx;
 
   if (convention === 'HEAD_RIGHT') {
     start = finalHeadIndex;

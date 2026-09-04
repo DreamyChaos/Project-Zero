@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useWorkspace } from '../../context/WorkspaceContext';
 import { WORKBENCH_CATEGORIES } from './tabRegistry';
+import { BottomTabId } from './types';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 
 export const DesktopBottomPanel: React.FC = () => {
@@ -37,7 +38,7 @@ export const DesktopBottomPanel: React.FC = () => {
           setActiveCategoryId(customEvent.detail.categoryId);
         }
         if (customEvent.detail.tabId) {
-          setActiveBottomTab(customEvent.detail.tabId as any);
+          setActiveBottomTab(customEvent.detail.tabId as BottomTabId);
         }
       }
     };

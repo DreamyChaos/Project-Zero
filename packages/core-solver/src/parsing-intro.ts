@@ -325,21 +325,19 @@ export function parseTopDown(
       ];
 
       // Clone forest and update leftmost open nonterminal node
-      function cloneNode(n: TDTreeNode): TDTreeNode {
-        return {
-          id: n.id,
-          symbol: n.symbol,
-          productionId: n.productionId,
-          depth: n.depth,
-          children: n.children.map(cloneNode),
-        };
-      }
+      const cloneNode = (n: TDTreeNode): TDTreeNode => ({
+        id: n.id,
+        symbol: n.symbol,
+        productionId: n.productionId,
+        depth: n.depth,
+        children: n.children.map(cloneNode),
+      });
 
       const newForest = current.forest.map(cloneNode);
 
       // Find leftmost open leaf node matching ntSymbol
       let targetNode: TDTreeNode | null = null;
-      function findLeftmostOpen(n: TDTreeNode): boolean {
+      const findLeftmostOpen = (n: TDTreeNode): boolean => {
         if (n.symbol.type === 'NON_TERMINAL' && n.children.length === 0) {
           if (n.symbol.value === ntSymbol) {
             targetNode = n;
@@ -350,7 +348,7 @@ export function parseTopDown(
           if (findLeftmostOpen(child)) return true;
         }
         return false;
-      }
+      };
 
       if (newForest.length > 0) {
         findLeftmostOpen(newForest[0]);

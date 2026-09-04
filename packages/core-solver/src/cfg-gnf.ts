@@ -195,7 +195,7 @@ export interface GNFTransformOptions {
 
 export function toGreibachNormalForm(
   grammar: ContextFreeGrammar,
-  _options: GNFTransformOptions = {}
+  _options?: GNFTransformOptions
 ): GNFTransformationResult {
   resetProdCounter();
 

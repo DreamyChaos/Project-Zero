@@ -6,6 +6,8 @@ import {
   isModelAllowed,
   REGISTERED_MODELS,
   ChatRequest,
+  ChatResponse,
+  GatewayErrorResponse,
 } from './index.js';
 
 describe('Phase 14A — Intelligent Server-Side NVIDIA Model Router', () => {
@@ -173,12 +175,12 @@ describe('Phase 14A — Intelligent Server-Side NVIDIA Model Router', () => {
     const response = await handleChatRequest(maliciousClientPayload, {
       providerConfig: {
         apiKey: 'test-nvapi-key',
-        fetchFn: mockFetch as any,
+        fetchFn: mockFetch as unknown as typeof fetch,
       },
     });
 
     expect(response.status).toBe(200);
-    const body = (response.body as any);
+    const body = response.body as ChatResponse;
     // Verified: the router chose Super 120b, NOT the malicious client model
     expect(body.model).toBe('nvidia/nemotron-3-super-120b-a12b');
     expect(body.routingInfo?.selectedModel).toBe('nvidia/nemotron-3-super-120b-a12b');
@@ -218,9 +220,9 @@ describe('Phase 14A — Intelligent Server-Side NVIDIA Model Router', () => {
   // --------------------------------------------------------------------------
   it('TEST 8: performs exactly ONE capability-aware fallback when primary model fails with upstream error', async () => {
     let callCount = 0;
-    const mockFetch = vi.fn().mockImplementation(async (_url: string, opts: any) => {
+    const mockFetch = vi.fn().mockImplementation(async (_url: string, opts?: RequestInit) => {
       callCount++;
-      const body = JSON.parse(opts.body);
+      const body = JSON.parse(opts?.body as string);
 
       if (callCount === 1) {
         // Primary attempt (Super 120b) fails with 503 upstream error
@@ -252,14 +254,14 @@ describe('Phase 14A — Intelligent Server-Side NVIDIA Model Router', () => {
       {
         providerConfig: {
           apiKey: 'test-nvapi-key',
-          fetchFn: mockFetch as any,
+          fetchFn: mockFetch as unknown as typeof fetch,
         },
       }
     );
 
     expect(response.status).toBe(200);
     expect(callCount).toBe(2);
-    const body = response.body as any;
+    const body = response.body as ChatResponse;
     expect(body.routingInfo?.fallbackUsed).toBe(true);
     expect(body.message.content).toContain('Fallback response');
   });
@@ -283,7 +285,7 @@ describe('Phase 14A — Intelligent Server-Side NVIDIA Model Router', () => {
       {
         providerConfig: {
           apiKey: 'test-nvapi-key',
-          fetchFn: mockFetch as any,
+          fetchFn: mockFetch as unknown as typeof fetch,
         },
       }
     );
@@ -291,7 +293,7 @@ describe('Phase 14A — Intelligent Server-Side NVIDIA Model Router', () => {
     expect(response.status).toBe(502);
     // Bounded: 1 primary call + 1 fallback call = exactly 2 calls, no recursion
     expect(callCount).toBe(2);
-    expect((response.body as any).error.type).toBe('upstream_error');
+    expect((response.body as GatewayErrorResponse).error.type).toBe('upstream_error');
   });
 
   // --------------------------------------------------------------------------
@@ -321,18 +323,18 @@ describe('Phase 14A — Intelligent Server-Side NVIDIA Model Router', () => {
       {
         providerConfig: {
           apiKey: 'test-nvapi-key',
-          fetchFn: mockFetch as any,
+          fetchFn: mockFetch as unknown as typeof fetch,
         },
       }
     );
 
     expect(response.status).toBe(200);
-    const body = response.body as any;
+    const body = response.body as ChatResponse;
     expect(body.actionProposal).toBeDefined();
-    expect(body.actionProposal.version).toBe('1.0.0');
-    expect(body.actionProposal.actions.length).toBe(1);
-    expect(body.actionProposal.actions[0].type).toBe('CREATE_STATE');
-    expect(body.actionProposal.actions[0].parameters.label).toBe('q0');
+    expect(body.actionProposal?.version).toBe('1.0.0');
+    expect(body.actionProposal?.actions.length).toBe(1);
+    expect(body.actionProposal?.actions[0].type).toBe('CREATE_STATE');
+    expect(body.actionProposal?.actions[0].parameters.label).toBe('q0');
     expect(body.message.content).toBe('I have designed the DFA for you.');
   });
 });

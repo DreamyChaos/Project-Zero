@@ -24,7 +24,7 @@ describe('Phase 9 — Frontend AI Chat Service', () => {
     globalThis.fetch = vi.fn().mockResolvedValue({
       ok: true,
       json: async () => mockResponse,
-    }) as any;
+    }) as unknown as typeof fetch;
 
     const messages: ChatMessage[] = [
       { role: 'user', content: 'What language does DFA recognize?' },
@@ -54,7 +54,7 @@ describe('Phase 9 — Frontend AI Chat Service', () => {
           type: 'config_error',
         },
       }),
-    }) as any;
+    }) as unknown as typeof fetch;
 
     const messages: ChatMessage[] = [{ role: 'user', content: 'Hello' }];
 

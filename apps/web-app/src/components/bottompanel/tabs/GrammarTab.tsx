@@ -316,7 +316,7 @@ export const GrammarTab: React.FC = () => {
   }, [grammar, syntacticInput]);
 
   useEffect(() => {
-    let timer: any;
+    let timer: ReturnType<typeof setInterval> | undefined;
     if (syntacticIsPlaying && syntacticResult && syntacticResult.steps.length > 0) {
       timer = setInterval(() => {
         setSyntacticStepIdx((prev) => {

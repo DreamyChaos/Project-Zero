@@ -22,7 +22,7 @@ export async function handleChatRequest(
     const routingDecision = selectModel(request);
     const primaryModelId = options?.providerConfig?.model || routingDecision.selectedModel;
 
-    let provider = new NvidiaProvider({
+    const provider = new NvidiaProvider({
       ...options?.providerConfig,
       model: primaryModelId,
     });

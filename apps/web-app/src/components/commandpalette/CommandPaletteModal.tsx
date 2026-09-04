@@ -6,6 +6,7 @@ import { useGraph } from '../../context/GraphContext';
 import { COMMAND_REGISTRY } from './commandRegistry';
 import { ICommand } from './types';
 import { CommandItem } from './CommandItem';
+import { BottomTabId } from '../bottompanel/types';
 import { serializeMachine } from '../../utils/serialization';
 import { Search, Command as CommandIcon, X, Clock } from 'lucide-react';
 
@@ -121,7 +122,7 @@ export const CommandPaletteModal: React.FC = () => {
 
   const navigateToBottomTab = (categoryId: string, tabId: string) => {
     expandPanel('bottomPanel');
-    setActiveBottomTab(tabId as any);
+    setActiveBottomTab(tabId as BottomTabId);
     window.dispatchEvent(
       new CustomEvent('navigate-to-tab', {
         detail: { categoryId, tabId },

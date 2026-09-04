@@ -317,7 +317,7 @@ export function encodeTM(
  */
 export function decodeTM(
   encodedString: string,
-  _format: TMEncodingFormat = 'BINARY_CANONICAL'
+  _format?: TMEncodingFormat
 ): TMDecodeResult {
   const trimmed = encodedString.trim();
   if (!trimmed) {
@@ -677,7 +677,7 @@ export function encodePair(
  */
 export function decodePair(
   pairString: string,
-  _format: TMEncodingFormat = 'BINARY_CANONICAL'
+  _format?: TMEncodingFormat
 ): UTMPairDecodeResult {
   const trimmed = pairString.trim();
   if (!trimmed) {
