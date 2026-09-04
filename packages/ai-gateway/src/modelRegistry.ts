@@ -1,4 +1,4 @@
-import { RegisteredModel } from './types.js';
+import { RegisteredModel } from './types';
 
 export const REGISTERED_MODELS: Record<string, RegisteredModel> = {
   'nvidia/nemotron-3-super-120b-a12b': {

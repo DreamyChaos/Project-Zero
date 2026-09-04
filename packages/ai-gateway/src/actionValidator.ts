@@ -2,12 +2,12 @@ import {
   AIActionEnvelope,
   AIActionItem,
   AIActionType,
-} from './types.js';
+} from './types';
 import {
   MAX_AI_ACTIONS_PER_PROPOSAL,
   MAX_ACTION_LABEL_LENGTH,
   MAX_ACTION_SYMBOL_LENGTH,
-} from './constants.js';
+} from './constants';
 
 export class ActionValidationError extends Error {
   constructor(message: string) {

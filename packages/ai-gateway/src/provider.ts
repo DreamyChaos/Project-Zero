@@ -1,9 +1,9 @@
-import { ChatRequest, ChatResponse } from './types.js';
-import { DEFAULT_ROUTED_MODEL, PROJECT_ZERO_GENERAL_ASSISTANT_INSTRUCTION } from './constants.js';
-import { isModelAllowed } from './modelRegistry.js';
-import { validateChatRequest } from './validator.js';
-import { serializeContextForPrompt } from './serializer.js';
-import { extractActionProposal } from './actionValidator.js';
+import { ChatRequest, ChatResponse } from './types';
+import { DEFAULT_ROUTED_MODEL, PROJECT_ZERO_GENERAL_ASSISTANT_INSTRUCTION } from './constants';
+import { isModelAllowed } from './modelRegistry';
+import { validateChatRequest } from './validator';
+import { serializeContextForPrompt } from './serializer';
+import { extractActionProposal } from './actionValidator';
 
 export interface NvidiaProviderConfig {
   apiKey?: string;

@@ -1,11 +1,11 @@
-import { ChatMessage, ChatRequest, AIContextSnapshot } from './types.js';
+import { ChatMessage, ChatRequest, AIContextSnapshot } from './types';
 import {
   MAX_MESSAGE_CONTENT_LENGTH,
   MAX_CONVERSATION_TURNS,
   MAX_CONTEXT_STATES,
   MAX_CONTEXT_TRANSITIONS,
   MAX_CONTEXT_DIAGNOSTICS,
-} from './constants.js';
+} from './constants';
 
 export class RequestValidationError extends Error {
   constructor(message: string) {

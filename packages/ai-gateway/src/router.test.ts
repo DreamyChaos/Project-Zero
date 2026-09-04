@@ -8,7 +8,7 @@ import {
   ChatRequest,
   ChatResponse,
   GatewayErrorResponse,
-} from './index.js';
+} from './index';
 
 describe('Phase 14A — Intelligent Server-Side NVIDIA Model Router', () => {
   // --------------------------------------------------------------------------

@@ -4,8 +4,8 @@ import {
   RoutingDecision,
   TaskCategory,
   TaskProfile,
-} from './types.js';
-import { getEnabledModels, getRegisteredModel } from './modelRegistry.js';
+} from './types';
+import { getEnabledModels, getRegisteredModel } from './modelRegistry';
 
 // ============================================================================
 // Phase 14A: Deterministic Task Profiler

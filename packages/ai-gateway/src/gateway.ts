@@ -1,7 +1,7 @@
-import { NvidiaProvider, NvidiaProviderConfig } from './provider.js';
-import { ChatRequest, ChatResponse, GatewayErrorResponse } from './types.js';
-import { RequestValidationError, validateChatRequest } from './validator.js';
-import { selectModel } from './modelRouter.js';
+import { NvidiaProvider, NvidiaProviderConfig } from './provider';
+import { ChatRequest, ChatResponse, GatewayErrorResponse } from './types';
+import { RequestValidationError, validateChatRequest } from './validator';
+import { selectModel } from './modelRouter';
 
 export interface HandleChatOptions {
   providerConfig?: NvidiaProviderConfig;

@@ -1,5 +1,5 @@
-import { AIContextSnapshot } from './types.js';
-import { MAX_SERIALIZED_CONTEXT_CHARS } from './constants.js';
+import { AIContextSnapshot } from './types';
+import { MAX_SERIALIZED_CONTEXT_CHARS } from './constants';
 
 /**
  * Deterministically serializes an AIContextSnapshot and Educational Evidence into a clean, compact markdown block

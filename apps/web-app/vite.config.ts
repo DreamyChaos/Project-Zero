@@ -1,6 +1,5 @@
 import { defineConfig, Plugin, loadEnv } from 'vite';
 import react from '@vitejs/plugin-react';
-import { handleChatRequest } from '@project-zero/ai-gateway';
 import path from 'path';
 
 function aiGatewayDevPlugin(): Plugin {
@@ -30,6 +29,7 @@ function aiGatewayDevPlugin(): Plugin {
 
         req.on('end', async () => {
           try {
+            const { handleChatRequest } = await import('@project-zero/ai-gateway');
             const parsed = bodyRaw ? JSON.parse(bodyRaw) : {};
             const result = await handleChatRequest(parsed);
             res.statusCode = result.status;
