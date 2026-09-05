@@ -232,10 +232,11 @@ describe('Phase 9, 10 & 11 — NVIDIA Nemotron AI Gateway & AI Tutor', () => {
 
       expect(body.model).toBe(REQUIRED_NVIDIA_MODEL);
       expect(body.messages[0].role).toBe('system');
-      expect(body.messages[0].content).toContain('You are the authoritative, comprehensive AI Assistant and Tutor for Project Zero');
+      expect(body.messages[0].content).toContain('You are the authoritative AI Assistant and Tutor for Project Zero');
       expect(body.messages[0].content).toContain('Equivalence Classes: [q0], [q1,q2]');
       expect(body.messages[1].role).toBe('user');
       expect(body.messages[1].content).toBe('Why are q1 and q2 merged in minimization?');
+
 
       expect(result.message.content).toContain('States q1 and q2 are equivalent');
     });
@@ -396,6 +397,141 @@ describe('Phase 9, 10 & 11 — NVIDIA Nemotron AI Gateway & AI Tutor', () => {
       const res = extractActionProposal(truncatedText);
       expect(res.actionProposal).toBeDefined();
       expect(res.actionProposal?.actions.length).toBe(2);
+    });
+  });
+
+  describe('Bounded Message & Context Safety Invariants', () => {
+    it('21. guarantees every outbound message to NVIDIA is <= 4000 characters (Invariant H)', async () => {
+      let interceptedMessages: { role: string; content: string }[] = [];
+      const mockFetch = vi.fn().mockImplementation(async (_url: string, init?: RequestInit) => {
+        const body = JSON.parse(init?.body as string);
+        interceptedMessages = body.messages;
+        return {
+          ok: true,
+          json: async () => ({
+            choices: [{ message: { role: 'assistant', content: 'Inference response' } }],
+          }),
+        };
+      });
+
+      const provider = new NvidiaProvider({
+        apiKey: 'nvapi-mock-token',
+        fetchFn: mockFetch as unknown as typeof fetch,
+      });
+
+      // Send with large context and long messages
+      await provider.chat({
+        messages: [
+          { role: 'user', content: 'What is a DFA?' },
+          { role: 'assistant', content: 'A'.repeat(4500) }, // Prior long assistant reply in history
+          { role: 'user', content: 'Explain it further.' },
+        ],
+        context: {
+          version: '1.0.0',
+          workspace: { activeMachineType: 'DFA' },
+          machine: {
+            type: 'DFA',
+            stateCount: 30,
+            states: Array.from({ length: 30 }, (_, i) => `q${i}`),
+            initialState: 'q0',
+            acceptingStates: ['q29'],
+            alphabet: ['0', '1'],
+            transitionCount: 60,
+            transitions: Array.from({ length: 60 }, (_, i) => ({
+              from: `q${i % 30}`,
+              symbol: i % 2 === 0 ? '0' : '1',
+              to: `q${(i + 1) % 30}`,
+            })),
+          },
+        },
+      });
+
+      expect(interceptedMessages.length).toBeGreaterThan(0);
+      const allBounded = interceptedMessages.every((m) => m.content.length <= 4000);
+      expect(allBounded).toBe(true);
+    });
+
+    it('22. handles long conversation history without index 5 exceeding length error', async () => {
+      const mockFetch = vi.fn().mockResolvedValue({
+        ok: true,
+        json: async () => ({
+          choices: [{ message: { role: 'assistant', content: 'Response to turn 7' } }],
+        }),
+      });
+
+      // Simulate a 7-turn conversation where history turn 5 had length > 4000
+      const historyWithLongTurn5: ChatMessage[] = [
+        { role: 'user', content: 'What is a DFA?' },
+        { role: 'assistant', content: 'A DFA is a deterministic finite automaton...' },
+        { role: 'user', content: 'Explain the pumping lemma simply.' },
+        { role: 'assistant', content: 'The pumping lemma states that...' },
+        { role: 'user', content: 'Give me an example.' },
+        { role: 'assistant', content: 'Here is a detailed proof and explanation: ' + 'X'.repeat(4200) }, // Index 5 > 4000 chars!
+        {
+          role: 'user',
+          content:
+            'Construct a 5-state DFA over {0,1} that accepts strings ending in 101 or 010. Use states q0 through q4, q0 as initial, and appropriate accepting states. Add all transitions required and explain how the DFA remembers the necessary suffix.',
+        },
+      ];
+
+      const res = await handleChatRequest(
+        { messages: historyWithLongTurn5 },
+        { providerConfig: { apiKey: 'test-nvapi', fetchFn: mockFetch as unknown as typeof fetch } }
+      );
+
+      expect(res.status).toBe(200);
+      expect((res.body as ChatResponse).message.content).toBe('Response to turn 7');
+    });
+
+    it('23. handles the exact 5-state DFA construction request with existing graph context', async () => {
+      const mockFetch = vi.fn().mockResolvedValue({
+        ok: true,
+        json: async () => ({
+          choices: [
+            {
+              message: {
+                role: 'assistant',
+                content:
+                  'Here is the 5-state DFA accepting strings ending in 101 or 010:\n\n```json:project-zero-actions\n{\n  "version": "1.0.0",\n  "summary": "Construct 5-state DFA for strings ending in 101 or 010",\n  "actions": [\n    { "id": "a1", "type": "CREATE_STATE", "parameters": { "label": "q0", "isInitial": true } },\n    { "id": "a2", "type": "CREATE_STATE", "parameters": { "label": "q1" } },\n    { "id": "a3", "type": "CREATE_STATE", "parameters": { "label": "q2" } },\n    { "id": "a4", "type": "CREATE_STATE", "parameters": { "label": "q3", "isAccepting": true } },\n    { "id": "a5", "type": "CREATE_STATE", "parameters": { "label": "q4", "isAccepting": true } },\n    { "id": "a6", "type": "CREATE_TRANSITION", "parameters": { "from": "q0", "to": "q1", "symbol": "0" } },\n    { "id": "a7", "type": "CREATE_TRANSITION", "parameters": { "from": "q0", "to": "q2", "symbol": "1" } }\n  ]\n}\n```',
+              },
+            },
+          ],
+        }),
+      });
+
+      const res = await handleChatRequest(
+        {
+          messages: [
+            {
+              role: 'user',
+              content:
+                'Construct a 5-state DFA over {0,1} that accepts strings ending in 101 or 010. Use states q0 through q4, q0 as initial, and appropriate accepting states. Add all transitions required and explain how the DFA remembers the necessary suffix.',
+            },
+          ],
+          context: {
+            version: '1.0.0',
+            workspace: { activeMachineType: 'DFA' },
+            selection: { selectedNodeLabels: [], selectedEdgeDescriptions: [] },
+            machine: {
+              type: 'DFA',
+              stateCount: 0,
+              states: [],
+              initialState: null,
+              acceptingStates: [],
+              alphabet: ['0', '1'],
+              transitionCount: 0,
+              transitions: [],
+            },
+          },
+        },
+        { providerConfig: { apiKey: 'test-nvapi', fetchFn: mockFetch as unknown as typeof fetch } }
+      );
+
+      expect(res.status).toBe(200);
+      const body = res.body as ChatResponse;
+      expect(body.actionProposal).toBeDefined();
+      expect(body.actionProposal?.actions.length).toBe(7);
+      expect(body.routingInfo?.taskCategory).toBe('AUTOMATON_CONSTRUCTION');
     });
   });
 });

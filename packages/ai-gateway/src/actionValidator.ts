@@ -126,21 +126,27 @@ function validateActionItemParameters(
  * Extracts and validates a structured action envelope from an AI response text if present.
  */
 export function extractActionProposal(content: string): { cleanedText: string; actionProposal?: AIActionEnvelope } {
-  // 1. Try matching fenced code blocks
-  const fencedBlockRegex = /```(?:json(?::[a-z0-9_-]+)?)?\s*\n?([\s\S]*?)\n?```/gi;
+  // 1. Try matching fenced code blocks with any language identifier
+  const fencedBlockRegex = /```(?:[a-zA-Z0-9_:-]+)?\s*\n?([\s\S]*?)\n?```/gi;
   let match: RegExpExecArray | null;
 
   while ((match = fencedBlockRegex.exec(content)) !== null) {
-    try {
-      const rawJson = JSON.parse(match[1].trim());
-      validateActionEnvelope(rawJson);
-      const cleanedText = content.replace(match[0], '').trim();
-      return {
-        cleanedText,
-        actionProposal: rawJson,
-      };
-    } catch {
-      // Continue searching
+    const rawContent = match[1].trim();
+    const startBracket = rawContent.indexOf('{');
+    const endBracket = rawContent.lastIndexOf('}');
+    if (startBracket !== -1 && endBracket !== -1 && endBracket > startBracket) {
+      try {
+        const jsonStr = rawContent.slice(startBracket, endBracket + 1);
+        const rawJson = JSON.parse(jsonStr);
+        validateActionEnvelope(rawJson);
+        const cleanedText = content.replace(match[0], '').trim();
+        return {
+          cleanedText,
+          actionProposal: rawJson,
+        };
+      } catch {
+        // Continue searching
+      }
     }
   }
 
@@ -187,3 +193,4 @@ export function extractActionProposal(content: string): { cleanedText: string; a
 
   return { cleanedText: content };
 }
+

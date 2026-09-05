@@ -12,17 +12,29 @@ import { getEnabledModels, getRegisteredModel } from './modelRegistry';
 // Zero I/O, zero network calls, sub-millisecond execution.
 // ============================================================================
 
+const EDUCATIONAL_QUERY_PATTERNS = [
+  /^(?:explain\s+how\s+to\s+(?:construct|build|create|design)\s+an?\s+(?:dfa|nfa|pda|tm|automaton)\b(?!\s*over|\s*with\s+states|\s*using\s+states|\s*for\s+this))/i,
+  /^(?:what\s+is|define|explain|teach\s+me|tell\s+me\s+about|walk\s+me\s+through\s+the\s+concept)\b/i,
+];
+
 const CONSTRUCTION_PATTERNS = [
-  /\b(?:create|construct|build|make|generate|design)\b.*\b(?:dfa|nfa|pda|tm|turing machine|automaton|machine|grammar|state)\b/i,
-  /\b(?:add|create|insert|new)\s+(?:state|node)\b/i,
-  /\b(?:add|create|insert|new)\s+(?:transition|edge|arrow)\b/i,
+  /\b(?:create|construct|build|make|generate|draw|design|synthesize)\b[\s\S]*?\b(?:dfas?|nfas?|pdas?|tms?|turing\s+machines?|automatons?|automata|machines?|grammars?|states?)\b/i,
+  /\b(?:add|create|insert|new)\s+(?:states?|nodes?)\b/i,
+  /\b(?:add|create|insert|new)\s+(?:transitions?|edges?|arrows?)\b/i,
+  /\b(?:complete\s+(?:the|this)?\s*(?:dfa|nfa|pda|tm|automaton|machine))\b/i,
+  /\b(?:missing\s+transitions?)\b/i,
 ];
 
 const EDITING_PATTERNS = [
-  /\b(?:modify|change|edit|update|replace)\b.*\b(?:transition|symbol|label|state|edge)\b/i,
-  /\b(?:delete|remove)\b.*\b(?:state|node|transition|edge)\b/i,
-  /\b(?:toggle|set)\b.*\b(?:initial|accepting|start)\b/i,
+  /\b(?:modify|change|edit|update|replace|repair|fix|correct)\b[\s\S]*?\b(?:transitions?|symbols?|labels?|states?|edges?|nodes?|dfas?|nfas?|pdas?|tms?|automatons?|machines?)\b/i,
+  /\b(?:delete|remove|clear)\b[\s\S]*?\b(?:states?|nodes?|transitions?|edges?|arrows?)\b/i,
+  /\b(?:toggle|set|make)\b[\s\S]*?\b(?:initial|accepting|final|start)\b/i,
+  /\b(?:rename|relabel)\s+(?:states?|nodes?)\b/i,
+  /\b(?:fix|repair|correct)\s+(?:this|the)?\s*(?:machine|dfa|nfa|pda|tm|automaton|graph)\b/i,
+  /\b(?:wrong|incorrect|missing)\s+transitions?\b/i,
+  /\b(?:apply\s+(?:this|these)?\s*changes?|convert\s+this\s+machine)\b/i,
 ];
+
 
 const COMPLEX_REASONING_PATTERNS = [
   /\b(?:reduction\s+proof|undecidab|halting\s+problem|rice's\s+theorem|post\s+correspondence|pcp)\b/i,
@@ -38,8 +50,9 @@ export function buildTaskProfile(request: ChatRequest): TaskProfile {
   const userText = (lastUserMsg?.content || '').trim();
   const lowerText = userText.toLowerCase();
 
-  const isConstructionQuery = CONSTRUCTION_PATTERNS.some((p) => p.test(lowerText));
-  const isEditingQuery = EDITING_PATTERNS.some((p) => p.test(lowerText));
+  const isEducationalGeneral = EDUCATIONAL_QUERY_PATTERNS.some((p) => p.test(lowerText));
+  const isConstructionQuery = !isEducationalGeneral && CONSTRUCTION_PATTERNS.some((p) => p.test(lowerText));
+  const isEditingQuery = !isEducationalGeneral && EDITING_PATTERNS.some((p) => p.test(lowerText));
   const isComplexFormalProof = COMPLEX_REASONING_PATTERNS.some((p) => p.test(lowerText));
 
   const tutorIntent = request.context?.tutorIntent;
@@ -78,6 +91,7 @@ export function buildTaskProfile(request: ChatRequest): TaskProfile {
     category = 'EDUCATIONAL_REASONING';
     reasoningComplexity = 'MEDIUM';
   } else if (
+    isEducationalGeneral ||
     tutorIntent === 'EXPLAIN' ||
     tutorIntent === 'CONCEPT' ||
     lowerText.startsWith('what is') ||

@@ -97,11 +97,19 @@ export function validateChatRequest(request: unknown): asserts request is ChatRe
       throw new RequestValidationError(`Message content at index ${i} cannot be empty.`);
     }
 
+    const isLatestUserMessage = i === req.messages.length - 1 && msg.role === 'user';
+
     if (msg.content.length > MAX_MESSAGE_CONTENT_LENGTH) {
-      throw new RequestValidationError(
-        `Message content at index ${i} exceeds maximum length of ${MAX_MESSAGE_CONTENT_LENGTH} characters.`
-      );
+      if (isLatestUserMessage) {
+        throw new RequestValidationError(
+          `Message content at index ${i} exceeds maximum length of ${MAX_MESSAGE_CONTENT_LENGTH} characters.`
+        );
+      } else {
+        // Deterministically bound history messages to prevent multi-turn session degradation
+        msg.content = msg.content.slice(0, 3800) + '\n... [History truncated for context]';
+      }
     }
+
   }
 
   if (req.context !== undefined && req.context !== null) {

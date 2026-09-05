@@ -29,16 +29,19 @@ function aiGatewayDevPlugin(): Plugin {
 
         req.on('end', async () => {
           try {
-            const { handleChatRequest } = await import('@project-zero/ai-gateway');
+            const aiGateway = await server.ssrLoadModule('@project-zero/ai-gateway');
+            const handleChatRequest = aiGateway.handleChatRequest;
             const parsed = bodyRaw ? JSON.parse(bodyRaw) : {};
             const result = await handleChatRequest(parsed);
             res.statusCode = result.status;
             res.setHeader('Content-Type', 'application/json');
             res.end(JSON.stringify(result.body));
-          } catch (err) {
-            res.statusCode = 400;
+          } catch (err: unknown) {
+            const error = err as Error;
+            console.error('[AI Gateway Middleware Error]:', error);
+            res.statusCode = 500;
             res.setHeader('Content-Type', 'application/json');
-            res.end(JSON.stringify({ error: { message: 'Invalid JSON request payload', type: 'validation_error' } }));
+            res.end(JSON.stringify({ error: { message: error.message || 'Internal server error in dev middleware', type: 'upstream_error' } }));
           }
         });
       });

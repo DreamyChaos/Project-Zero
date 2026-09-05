@@ -62,4 +62,31 @@ describe('Phase 9 — Frontend AI Chat Service', () => {
       'NVIDIA_API_KEY is not configured on the gateway server.'
     );
   });
+
+  it('3. bounds conversation history to <= 4000 characters while preserving current user query', async () => {
+    let capturedBody: { messages: ChatMessage[] } | null = null;
+    globalThis.fetch = vi.fn().mockImplementation(async (_url: string, init?: RequestInit) => {
+      capturedBody = JSON.parse(init?.body as string);
+      return {
+        ok: true,
+        json: async () => ({
+          message: { role: 'assistant', content: 'Reply to short user message' },
+        }),
+      };
+    }) as unknown as typeof fetch;
+
+    const longHistory: ChatMessage[] = [
+      { role: 'user', content: 'What is DFA?' },
+      { role: 'assistant', content: 'A'.repeat(5000) }, // Long previous assistant message
+      { role: 'user', content: 'Construct a 5-state DFA' },
+    ];
+
+    await sendChatMessage(longHistory);
+
+    expect(capturedBody).not.toBeNull();
+    const sentMessages = capturedBody!.messages;
+    expect(sentMessages[1].content.length).toBeLessThanOrEqual(4000);
+    expect(sentMessages[1].content).toContain('[History truncated for context]');
+    expect(sentMessages[2].content).toBe('Construct a 5-state DFA');
+  });
 });

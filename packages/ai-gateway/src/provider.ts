@@ -4,6 +4,7 @@ import { isModelAllowed } from './modelRegistry';
 import { validateChatRequest } from './validator';
 import { serializeContextForPrompt } from './serializer';
 import { extractActionProposal } from './actionValidator';
+import { buildTaskProfile } from './modelRouter';
 
 export interface NvidiaProviderConfig {
   apiKey?: string;
@@ -70,23 +71,80 @@ export class NvidiaProvider {
     }
 
     // 3. Prepare payload with General Assistant system instruction and sanitized application context
+    const profile = buildTaskProfile(request);
     let systemInstruction = PROJECT_ZERO_GENERAL_ASSISTANT_INSTRUCTION;
-    if (request.context) {
-      const contextStr = serializeContextForPrompt(request.context);
-      systemInstruction += `\n\n=== CURRENT USER WORKSPACE & MACHINE CONTEXT ===\n${contextStr}\n================================================`;
+    let contextMessageContent: string | null = null;
+
+    let actionDirective = '';
+    if (profile.requiresStructuredActions) {
+      actionDirective = '\n\n=== MANDATORY ACTION-FIRST DIRECTIVE ===\nThe user is requesting automaton construction, modification, or repair.\n1. You MUST output the ```json:project-zero-actions envelope FIRST.\n2. Do NOT write step-by-step reasoning or monologue before the JSON block.\n3. Put any educational notes, suffix explanations, or state roles strictly AFTER the action block.\n========================================';
     }
 
-    const upstreamMessages = [
-      { role: 'system', content: systemInstruction },
-      ...request.messages.map((m) => ({ role: m.role, content: m.content })),
+    if (request.context) {
+      const contextStr = serializeContextForPrompt(request.context);
+      const combined = `${PROJECT_ZERO_GENERAL_ASSISTANT_INSTRUCTION}${actionDirective}\n\n=== CURRENT USER WORKSPACE & MACHINE CONTEXT ===\n${contextStr}\n================================================`;
+      if (combined.length <= 4000) {
+        systemInstruction = combined;
+      } else {
+        // If combined exceeds 4000 chars, split into dedicated system messages (each <= 4000)
+        systemInstruction = `${PROJECT_ZERO_GENERAL_ASSISTANT_INSTRUCTION}${actionDirective}`;
+        contextMessageContent = `=== CURRENT USER WORKSPACE & MACHINE CONTEXT ===\n${contextStr}\n================================================`;
+      }
+    } else if (actionDirective) {
+      systemInstruction = `${PROJECT_ZERO_GENERAL_ASSISTANT_INSTRUCTION}${actionDirective}`;
+    }
+
+    const upstreamMessages: { role: string; content: string }[] = [
+      { role: 'system', content: systemInstruction.length > 4000 ? systemInstruction.slice(0, 4000) : systemInstruction },
     ];
+
+    if (contextMessageContent) {
+      upstreamMessages.push({
+        role: 'system',
+        content: contextMessageContent.length > 4000 ? contextMessageContent.slice(0, 4000) : contextMessageContent,
+      });
+    }
+
+    // Add conversation history with deterministic bounding:
+    // - The active user query (last turn) is preserved exactly
+    // - Prior history messages are bounded to <= 4000 characters
+    const turns = request.messages;
+    for (let i = 0; i < turns.length; i++) {
+      const turn = turns[i];
+      const isLatest = i === turns.length - 1;
+      let content = turn.content;
+
+      if (!isLatest && content.length > 4000) {
+        content = content.slice(0, 3800) + '\n... [History truncated for context]';
+      }
+
+      if (isLatest && profile.requiresStructuredActions) {
+        const actionPromptSuffix = '\n\n[MANDATORY FORMAT: Begin your response directly with the structured JSON block:\n```json:project-zero-actions\n{\n  "version": "1.0.0",\n  "summary": "Brief summary of construction/modifications",\n  "actions": [\n    ...\n  ]\n}\n```\nFollowed by your concise educational explanation of states and suffixes.]';
+        if (content.length + actionPromptSuffix.length <= 4000) {
+          content = `${content}${actionPromptSuffix}`;
+        }
+      }
+
+      upstreamMessages.push({
+        role: turn.role,
+        content,
+      });
+    }
+
+    // Safety Invariant: Every outbound message sent to NVIDIA MUST remain <= 4000 characters
+    for (let idx = 0; idx < upstreamMessages.length; idx++) {
+      if (upstreamMessages[idx].content.length > 4000) {
+        upstreamMessages[idx].content = upstreamMessages[idx].content.slice(0, 4000);
+      }
+    }
 
     const body = {
       model: this.model,
       messages: upstreamMessages,
-      max_tokens: request.maxTokens ?? 3500,
-      temperature: request.temperature ?? 0.2,
+      max_tokens: request.maxTokens ?? 8192,
+      temperature: request.temperature ?? 0.1,
     };
+
 
     // 4. Dispatch request
     let response: Response;

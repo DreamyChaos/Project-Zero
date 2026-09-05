@@ -137,7 +137,7 @@ export const AIChatWorkspace: React.FC<AIChatWorkspaceProps> = ({ onClose }) => 
     // Attach inferred intent if provided
     const contextWithIntent = {
       ...currentContext,
-      tutorIntent: intent || 'EXPLAIN',
+      tutorIntent: intent || currentContext.tutorIntent || undefined,
     };
 
     try {

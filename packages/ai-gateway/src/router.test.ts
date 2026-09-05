@@ -337,4 +337,67 @@ describe('Phase 14A — Intelligent Server-Side NVIDIA Model Router', () => {
     expect(body.actionProposal?.actions[0].parameters.label).toBe('q0');
     expect(body.message.content).toBe('I have designed the DFA for you.');
   });
+
+  // --------------------------------------------------------------------------
+  // TEST 11: Exact 5-State DFA Construction Query
+  // --------------------------------------------------------------------------
+  it('TEST 11: correctly profiles exact 5-state DFA construction prompt as AUTOMATON_CONSTRUCTION', () => {
+    const prompt =
+      'Construct a 5-state DFA over {0,1} that accepts strings ending in 101 or 010. Use states q0 through q4, q0 as initial, and appropriate accepting states. Add all transitions required and explain how the DFA remembers the necessary suffix.';
+
+    const decision = selectModel({
+      messages: [{ role: 'user', content: prompt }],
+    });
+
+    expect(decision.selectedModel).toBe('nvidia/nemotron-3-super-120b-a12b');
+    expect(decision.taskProfile.category).toBe('AUTOMATON_CONSTRUCTION');
+    expect(decision.taskProfile.requiresStructuredActions).toBe(true);
+    expect(decision.taskProfile.requiresGraphConstruction).toBe(true);
+  });
+
+  // --------------------------------------------------------------------------
+  // TEST 12: All Construction Phrase Variations
+  // --------------------------------------------------------------------------
+  it('TEST 12: accurately profiles all standard construction phrase variations as AUTOMATON_CONSTRUCTION', () => {
+    const phrases = [
+      'construct a DFA that recognizes even binary numbers',
+      'build a DFA for strings with alternating bits',
+      'create states q0 and q1',
+      'add transitions between initial and accepting states',
+      'make an automaton for L = {w | w has 00}',
+      'construct an NFA for (01)*',
+      'build a PDA for 0^n 1^n',
+      'create a TM for binary increment',
+    ];
+
+    for (const phrase of phrases) {
+      const decision = selectModel({
+        messages: [{ role: 'user', content: phrase }],
+      });
+      expect(decision.taskProfile.category).toBe('AUTOMATON_CONSTRUCTION');
+      expect(decision.taskProfile.requiresStructuredActions).toBe(true);
+    }
+  });
+
+  // --------------------------------------------------------------------------
+  // TEST 13: Graph Editing Phrase Variations
+  // --------------------------------------------------------------------------
+  it('TEST 13: accurately profiles graph editing phrases as GRAPH_EDITING', () => {
+    const phrases = [
+      'modify the transition from q0 to q1',
+      'delete state q2',
+      'remove transition on symbol 0',
+      'toggle accepting state on q3',
+      'set initial state to q1',
+      'rename state q0 to start',
+    ];
+
+    for (const phrase of phrases) {
+      const decision = selectModel({
+        messages: [{ role: 'user', content: phrase }],
+      });
+      expect(decision.taskProfile.category).toBe('GRAPH_EDITING');
+      expect(decision.taskProfile.requiresStructuredActions).toBe(true);
+    }
+  });
 });

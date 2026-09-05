@@ -10,21 +10,36 @@ export interface SendChatMessageResult {
   actionProposal?: AIActionEnvelope;
 }
 
+export function boundChatMessage(msg: ChatMessage, isLatestUserMessage: boolean): ChatMessage {
+  if (isLatestUserMessage || msg.content.length <= 4000) {
+    return msg;
+  }
+  return {
+    ...msg,
+    content: msg.content.slice(0, 3800) + '\n... [History truncated for context]',
+  };
+}
+
 export async function sendChatMessage(
   messages: ChatMessage[],
   options?: SendChatMessageOptions
 ): Promise<SendChatMessageResult> {
+  const sanitizedMessages = messages.map((m, idx) =>
+    boundChatMessage(m, idx === messages.length - 1 && m.role === 'user')
+  );
+
   const response = await fetch('/api/ai/chat', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      messages,
+      messages: sanitizedMessages,
       context: options?.context,
     }),
     signal: options?.signal,
   });
+
 
   if (!response.ok) {
     let errorMessage = `HTTP error ${response.status}`;
